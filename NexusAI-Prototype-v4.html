@@ -851,9 +851,14 @@ viewport.addEventListener('mousemove', (e) => {
     dragDelta.set(e.clientX-dragStart.x, e.clientY-dragStart.y);
     dragStart.set(e.clientX, e.clientY);
     // Pan camera
+    // Isometric pan: finger up → scene moves up (camTarget.z increases in iso view)
     const panSpeed = 0.012 / camZoom;
-    camTarget.x -= dragDelta.x * panSpeed;
-    camTarget.z += dragDelta.y * panSpeed;
+    // Screen horizontal → iso X-axis (right-down): deltaX affects X
+    // Screen vertical → iso Z-axis (left-down): deltaY affects Z with sign flipped for iso
+    const isoPanX = dragDelta.x * panSpeed;
+    const isoPanZ = -dragDelta.y * panSpeed;
+    camTarget.x -= isoPanX * 0.85 - isoPanZ * 0.15;
+    camTarget.z -= isoPanZ * 0.85 + isoPanX * 0.15;
     // Clamp
     camTarget.x = Math.max(-9, Math.min(9, camTarget.x));
     camTarget.z = Math.max(-5.5, Math.min(8.5, camTarget.z));
@@ -956,8 +961,10 @@ viewport.addEventListener('touchmove', (e) => {
     dragDelta.set(e.touches[0].clientX - dragStart.x, e.touches[0].clientY - dragStart.y);
     dragStart.set(e.touches[0].clientX, e.touches[0].clientY);
     const panSpeed = 0.015 / camZoom;
-    camTarget.x -= dragDelta.x * panSpeed;
-    camTarget.z += dragDelta.y * panSpeed;
+    const isoPanX = dragDelta.x * panSpeed;
+    const isoPanZ = -dragDelta.y * panSpeed;
+    camTarget.x -= isoPanX * 0.85 - isoPanZ * 0.15;
+    camTarget.z -= isoPanZ * 0.85 + isoPanX * 0.15;
     camTarget.x = Math.max(-9, Math.min(9, camTarget.x));
     camTarget.z = Math.max(-5.5, Math.min(8.5, camTarget.z));
     updateCamera();
