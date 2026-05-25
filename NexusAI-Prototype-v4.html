@@ -854,7 +854,7 @@ viewport.addEventListener('mousemove', (e) => {
     // Direct pan: finger direction → scene moves same direction
     const panSpeed = 0.012 / camZoom;
     camTarget.x -= dragDelta.x * panSpeed;
-    camTarget.z -= dragDelta.y * panSpeed;
+    camTarget.z += dragDelta.y * panSpeed;
     // Clamp
     camTarget.x = Math.max(-9, Math.min(9, camTarget.x));
     camTarget.z = Math.max(-5.5, Math.min(8.5, camTarget.z));
@@ -958,7 +958,7 @@ viewport.addEventListener('touchmove', (e) => {
     dragStart.set(e.touches[0].clientX, e.touches[0].clientY);
     const panSpeed = 0.015 / camZoom;
     camTarget.x -= dragDelta.x * panSpeed;
-    camTarget.z -= dragDelta.y * panSpeed;
+    camTarget.z += dragDelta.y * panSpeed;
     camTarget.x = Math.max(-9, Math.min(9, camTarget.x));
     camTarget.z = Math.max(-5.5, Math.min(8.5, camTarget.z));
     updateCamera();
