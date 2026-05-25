@@ -767,35 +767,38 @@ function createLabelSprite(text, pos, colorHex){
 
 function createCharacter(x, z, bodyColor){
   const group = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({color:bodyColor, roughness:0.45, metalness:0.05});
-  const skin = new THREE.MeshStandardMaterial({color:0xE8C9A0, roughness:0.6, metalness:0});
-  const dark = new THREE.MeshStandardMaterial({color:0x334155, roughness:0.5, metalness:0.1});
+  // Brighter, more saturated version of body color
+  const hsl = {};
+  new THREE.Color(bodyColor).getHSL(hsl);
+  const brightColor = new THREE.Color().setHSL(hsl.h, Math.min(1, hsl.s*1.3), Math.min(0.7, hsl.l*1.5));
+  const bodyMat = new THREE.MeshStandardMaterial({color:brightColor, roughness:0.3, metalness:0.1});
+  const skinMat = new THREE.MeshStandardMaterial({color:0xF5DCC3, roughness:0.5, metalness:0});
+  const pantsMat = new THREE.MeshStandardMaterial({color:0x1E293B, roughness:0.45, metalness:0.1});
 
   // Legs
-  const legGeom = new THREE.BoxGeometry(0.07, 0.22, 0.07);
-  const leftLeg = new THREE.Mesh(legGeom, dark); leftLeg.position.set(-0.05, 0.11, 0); leftLeg.castShadow=true;
-  const rightLeg = new THREE.Mesh(legGeom, dark); rightLeg.position.set(0.05, 0.11, 0); rightLeg.castShadow=true;
-  group.add(leftLeg, rightLeg);
+  const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.35, 8), pantsMat);
+  leg.position.y = 0.175; leg.castShadow=true;
+  group.add(leg);
 
-  // Torso (slightly tapered via scale)
-  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.22, 0.09), mat);
-  torso.position.y = 0.33; torso.castShadow=true;
+  // Torso (wider cylinder)
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.12, 0.35, 10), bodyMat);
+  torso.position.y = 0.50; torso.castShadow=true;
   group.add(torso);
 
-  // Arms
-  const armGeom = new THREE.BoxGeometry(0.05, 0.18, 0.05);
-  const leftArm = new THREE.Mesh(armGeom, mat); leftArm.position.set(-0.11, 0.35, 0); leftArm.castShadow=true;
-  const rightArm = new THREE.Mesh(armGeom, mat); rightArm.position.set(0.11, 0.35, 0); rightArm.castShadow=true;
-  group.add(leftArm, rightArm);
+  // Arms (thin cylinders angled slightly)
+  const armGeom = new THREE.CylinderGeometry(0.04, 0.04, 0.28, 8);
+  const lArm = new THREE.Mesh(armGeom, bodyMat); lArm.position.set(-0.14, 0.52, 0); lArm.rotation.z=0.2; lArm.castShadow=true;
+  const rArm = new THREE.Mesh(armGeom, bodyMat); rArm.position.set(0.14, 0.52, 0); rArm.rotation.z=-0.2; rArm.castShadow=true;
+  group.add(lArm, rArm);
 
   // Head
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), skin);
-  head.position.y = 0.50; head.castShadow=true;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), skinMat);
+  head.position.y = 0.78; head.castShadow=true;
   group.add(head);
 
-  // Hair / cap
-  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.085, 8, 6, 0, Math.PI*2, 0, Math.PI*0.55), dark);
-  hair.position.y = 0.53; group.add(hair);
+  // Hair
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10, 0, Math.PI*2, 0, Math.PI*0.45), pantsMat);
+  hair.position.y = 0.82; group.add(hair);
 
   group.position.set(x, 0, z);
   return group;
@@ -815,9 +818,9 @@ DEPTS.forEach(dept => {
     // Chair behind each desk
     scene.add(createChair(dept.pos.x + dx + 0.5, dept.pos.z + dz));
   });
-  // Characters at desks (standing to the side)
+  // Characters at desks (standing in front, camera-visible side)
   dept.desksLayout.forEach(([dx,dz]) => {
-    const charGroup = createCharacter(dept.pos.x + dx - 0.55, dept.pos.z + dz - 0.35, dept.color);
+    const charGroup = createCharacter(dept.pos.x + dx + 0.7, dept.pos.z + dz + 0.5, dept.color);
     charGroup.userData = { dept: dept.id, type: 'character' };
     scene.add(charGroup);
     allDesks.push(charGroup);
