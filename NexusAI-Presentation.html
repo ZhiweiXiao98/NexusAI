@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAI — 金融行业工作流数字孪生平台 · 产品演示</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html,body{height:100%;overflow-x:hidden}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.slide{width:100vw;height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;display:flex;flex-direction:column;position:relative}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-height:100%;overflow:hidden;padding:var(--slide-padding)}
+:root{
+  --title-size:clamp(1.8rem,5vw,3.5rem);
+  --h2-size:clamp(1.25rem,3.5vw,2.2rem);
+  --h3-size:clamp(1rem,2.5vw,1.5rem);
+  --body-size:clamp(0.8rem,1.5vw,1.05rem);
+  --small-size:clamp(0.65rem,1vw,0.85rem);
+  --slide-padding:clamp(1.5rem,4vw,3.5rem);
+  --content-gap:clamp(0.8rem,2vw,1.5rem);
+  --element-gap:clamp(0.4rem,1vw,0.8rem);
+}
+.card,.container,.content-box{max-width:min(90vw,1000px);max-height:min(80vh,700px)}
+.feature-list,.bullet-list{gap:clamp(0.4rem,1vh,0.8rem)}
+.feature-list li,.bullet-list li{font-size:var(--body-size);line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:clamp(0.5rem,1.5vw,1rem)}
+img,.image-container{max-width:100%;max-height:min(50vh,400px);object-fit:contain}
+@media(max-height:700px){
+  :root{--slide-padding:clamp(0.75rem,3vw,2rem);--content-gap:clamp(0.4rem,1.5vw,1rem);--title-size:clamp(1.5rem,4.5vw,2.5rem);--h2-size:clamp(1.1rem,3vw,1.75rem)}
+}
+@media(max-height:600px){
+  :root{--slide-padding:clamp(0.5rem,2.5vw,1.5rem);--content-gap:clamp(0.3rem,1vw,0.75rem);--title-size:clamp(1.2rem,4vw,2rem);--body-size:clamp(0.7rem,1.2vw,0.9rem)}
+  .nav-dots,.keyboard-hint{display:none}
+}
+@media(max-height:500px){
+  :root{--slide-padding:clamp(0.4rem,2vw,1rem);--title-size:clamp(1rem,3.5vw,1.5rem);--h2-size:clamp(0.9rem,2.5vw,1.25rem);--body-size:clamp(0.65rem,1vw,0.85rem)}
+}
+@media(max-width:600px){
+  :root{--title-size:clamp(1.25rem,7vw,2.5rem)}
+  .grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.2s!important}
+  html{scroll-behavior:auto}
+}
+
+/* ===========================================
+   NEXUSAI THEME — Dark Financial
+   =========================================== */
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg-deep:#070b14;
+  --bg-surface:#0d1225;
+  --gold:#c9a84c;
+  --gold-dim:rgba(201,168,76,0.2);
+  --blue:#5b8cb8;
+  --blue-dim:rgba(91,140,184,0.15);
+  --text-primary:#e8e6e1;
+  --text-secondary:#8b8d97;
+  --text-muted:#545762;
+  --red:#c45a5a;
+  --green:#4a9c6c;
+  --border:rgba(255,255,255,0.06);
+  --ease: cubic-bezier(0.22,1,0.36,1);
+  --font-display:'Cormorant Garamond',serif;
+  --font-body:'DM Sans',-apple-system,sans-serif;
+}
+
+body{
+  font-family:var(--font-body);
+  background:var(--bg-deep);
+  color:var(--text-primary);
+}
+
+/* Progress bar */
+.progress-bar{
+  position:fixed;top:0;left:0;height:2px;
+  background:var(--gold);
+  z-index:1000;
+  transition:width 0.3s var(--ease);
+}
+
+/* Nav dots */
+.nav-dots{
+  position:fixed;right:clamp(12px,2vw,24px);
+  top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;
+  gap:clamp(8px,1.5vh,14px);
+  z-index:100;
+}
+.nav-dots .dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--text-muted);
+  cursor:pointer;
+  transition:all 0.3s var(--ease);
+}
+.nav-dots .dot.active{
+  background:var(--gold);
+  box-shadow:0 0 8px var(--gold-dim);
+  transform:scale(1.3);
+}
+
+/* Keyboard hint */
+.keyboard-hint{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  font-size:11px;color:var(--text-muted);
+  z-index:100;
+  opacity:0.7;
+}
+
+/* Background decorations */
+.bg-glow{
+  position:absolute;pointer-events:none;
+  border-radius:50%;filter:blur(80px);
+  opacity:0.08;
+}
+.bg-glow.gold{background:var(--gold);width:500px;height:500px}
+.bg-glow.blue{background:var(--blue);width:400px;height:400px}
+
+/* Animations */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity 0.5s var(--ease),transform 0.5s var(--ease);
+}
+.slide.visible .reveal{opacity:1;transform:translateY(0)}
+.reveal:nth-child(1){transition-delay:0.08s}
+.reveal:nth-child(2){transition-delay:0.16s}
+.reveal:nth-child(3){transition-delay:0.24s}
+.reveal:nth-child(4){transition-delay:0.32s}
+.reveal:nth-child(5){transition-delay:0.4s}
+.reveal:nth-child(6){transition-delay:0.48s}
+
+/* Typography */
+.display{
+  font-family:var(--font-display);
+  font-weight:700;
+  letter-spacing:-0.02em;
+}
+.subtitle{
+  font-family:var(--font-body);
+  font-weight:400;
+  color:var(--text-secondary);
+}
+
+/* Slide backgrounds */
+.slide{background:var(--bg-deep)}
+.slide.title-slide{
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 30%,rgba(91,140,184,0.04) 0%,transparent 40%),
+    var(--bg-deep);
+}
+.slide.dark-alt{background:var(--bg-surface)}
+.slide.split-bg{
+  background:
+    linear-gradient(135deg,var(--bg-surface) 50%,var(--bg-deep) 50%);
+}
+
+/* Layout helpers */
+.center{text-align:center}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:var(--content-gap);align-items:center}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--content-gap)}
+@media(max-width:768px){.two-col,.three-col{grid-template-columns:1fr}}
+
+/* Cards */
+.stat-card{
+  background:var(--bg-surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:clamp(14px,2vw,24px);
+  text-align:center;
+  transition:border-color 0.3s;
+}
+.stat-card:hover{border-color:var(--gold-dim)}
+.stat-card .number{
+  font-family:var(--font-display);
+  font-size:clamp(2rem,5vw,3rem);
+  font-weight:700;
+  color:var(--gold);
+  line-height:1;
+}
+.stat-card .label{
+  font-size:var(--small-size);
+  color:var(--text-muted);
+  margin-top:8px;
+}
+
+.feature-box{
+  background:var(--bg-surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:clamp(16px,2.5vw,28px);
+}
+.feature-box h3{
+  font-family:var(--font-display);
+  font-size:var(--h3-size);
+  color:var(--gold);
+  margin-bottom:10px;
+}
+.feature-box p{
+  font-size:var(--body-size);
+  color:var(--text-secondary);
+  line-height:1.6;
+}
+
+/* Timeline */
+.timeline{position:relative;padding-left:40px}
+.timeline::before{
+  content:'';position:absolute;left:16px;top:0;bottom:0;
+  width:1px;background:var(--gold-dim);
+}
+.timeline-item{
+  position:relative;margin-bottom:clamp(12px,2vh,24px);
+  padding-left:24px;
+}
+.timeline-item::before{
+  content:'';position:absolute;left:-28px;top:4px;
+  width:10px;height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  border:2px solid var(--bg-deep);
+}
+.timeline-item .phase{
+  font-size:var(--small-size);
+  color:var(--gold);
+  font-weight:600;
+  margin-bottom:4px;
+}
+.timeline-item .desc{
+  font-size:var(--body-size);
+  color:var(--text-secondary);
+}
+
+/* Table */
+.data-table{width:100%;border-collapse:collapse;font-size:var(--body-size)}
+.data-table th{
+  text-align:left;padding:10px 12px;
+  border-bottom:1px solid var(--gold-dim);
+  color:var(--gold);font-weight:600;
+  font-size:var(--small-size);
+}
+.data-table td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+  color:var(--text-secondary);
+}
+.data-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* Tag */
+.tag{
+  display:inline-block;padding:3px 10px;
+  border-radius:12px;font-size:11px;font-weight:500;
+}
+.tag.gold{background:var(--gold-dim);color:var(--gold)}
+.tag.blue{background:var(--blue-dim);color:var(--blue)}
+.tag.red{background:rgba(196,90,90,0.15);color:var(--red)}
+
+/* Icon boxes */
+.icon-row{display:flex;gap:clamp(20px,3vw,40px);justify-content:center;flex-wrap:wrap}
+.icon-box{text-align:center;width:clamp(100px,15vw,160px)}
+.icon-box .circle{
+  width:clamp(48px,7vw,64px);height:clamp(48px,7vw,64px);
+  border-radius:50%;
+  margin:0 auto clamp(10px,1.5vw,16px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(20px,3vw,28px);
+}
+.icon-box .circle.gold{background:var(--gold-dim);border:1px solid var(--gold)}
+.icon-box .circle.blue{background:var(--blue-dim);border:1px solid var(--blue)}
+.icon-box .title{font-size:var(--small-size);font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.icon-box .desc{font-size:11px;color:var(--text-muted)}
+
+/* Divider */
+.divider{width:60px;height:1px;background:var(--gold);margin:clamp(12px,2vh,20px) auto;opacity:0.5}
+
+/* Quote */
+blockquote{
+  font-family:var(--font-display);
+  font-size:var(--h3-size);
+  color:var(--text-secondary);
+  font-style:italic;
+  border-left:2px solid var(--gold);
+  padding-left:20px;
+  margin:var(--content-gap) 0;
+  max-width:600px;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots"></nav>
+<div class="keyboard-hint">← → 导航 · 空格翻页</div>
+
+<!-- ===== SLIDE 1: TITLE ===== -->
+<section class="slide title-slide visible">
+  <div class="bg-glow gold" style="top:10%;left:5%"></div>
+  <div class="bg-glow blue" style="bottom:20%;right:10%"></div>
+  <div class="slide-content center">
+    <p class="reveal subtitle" style="color:var(--gold);letter-spacing:3px;text-transform:uppercase;font-size:var(--small-size);margin-bottom:var(--element-gap)">产品演示</p>
+    <h1 class="reveal display" style="font-size:var(--title-size);margin-bottom:var(--element-gap)">
+      Nexus<span style="color:var(--gold)">AI</span>
+    </h1>
+    <p class="reveal subtitle" style="font-size:clamp(1rem,2vw,1.4rem);margin-bottom:var(--content-gap)">
+      金融行业工作流数字孪生平台
+    </p>
+    <div class="reveal divider"></div>
+    <p class="reveal" style="color:var(--text-muted);font-size:var(--small-size)">
+      2026年5月 · 机密
+    </p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 2: PAIN POINTS ===== -->
+<section class="slide dark-alt">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">金融机构面临的三大核心问题</h2>
+    <div class="three-col">
+      <div class="reveal feature-box">
+        <div class="circle gold" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px">⏳</div>
+        <h3>决策滞后</h3>
+        <p>跨部门协作信息传递延迟 4-6 小时。项目延期通常复盘时才发现，错失最佳干预窗口。</p>
+        <p style="color:var(--red);margin-top:8px;font-size:var(--small-size)">67% 项目存在隐性延期</p>
+      </div>
+      <div class="reveal feature-box">
+        <div class="circle blue" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px">📦</div>
+        <h3>资源黑盒</h3>
+        <p>A团队加班崩溃，B团队却在等需求。负载和产能无法量化，资源配置全凭经验。</p>
+        <p style="color:var(--gold);margin-top:8px;font-size:var(--small-size)">平均利用率仅 62%</p>
+      </div>
+      <div class="reveal feature-box">
+        <div class="circle" style="background:rgba(196,90,90,0.15);border:1px solid var(--red);width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px">🛡</div>
+        <h3>合规压力</h3>
+        <p>等保三级、GDPR等监管要求下，AI决策必须可审计可追溯。黑盒模型无法通过审查。</p>
+        <p style="color:var(--red);margin-top:8px;font-size:var(--small-size)">82% 金融机构面临AI合规挑战</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 3: SOLUTION ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:clamp(8px,1.5vh,16px)">解决方案：五层架构全景</h2>
+    <p class="reveal subtitle" style="margin-bottom:var(--content-gap);font-size:var(--body-size)">从数据到决策，构建金融机构的完整数字孪生</p>
+    <div class="reveal" style="text-align:center">
+      <img src="NexusAI-Architecture.svg" alt="NexusAI架构" style="max-height:min(55vh,480px);max-width:100%;object-fit:contain;border-radius:8px">
+    </div>
+    <p class="reveal" style="color:var(--text-muted);font-size:11px;text-align:center;margin-top:8px">
+      数据织物 → 行为建模 → 仿真环境 → 决策智能 → 体验编排
+    </p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 4: CAPABILITIES ===== -->
+<section class="slide dark-alt">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">四大核心能力</h2>
+    <div class="two-col">
+      <div>
+        <div class="reveal feature-box" style="margin-bottom:var(--element-gap)">
+          <h3>瓶颈预测</h3>
+          <p>基于历史数据预测任务/项目延期，提前 7-14 天发出预警。准确率目标 85%+。</p>
+        </div>
+        <div class="reveal feature-box">
+          <h3>协作效率分析</h3>
+          <p>GNN图神经网络识别沟通瓶颈、信息孤岛。可视化每个团队的协作健康度。</p>
+        </div>
+      </div>
+      <div>
+        <div class="reveal feature-box" style="margin-bottom:var(--element-gap)">
+          <h3>资源优化</h3>
+          <p>分析团队负载，自动建议任务重新分配。What-If 推演：调整X对Y的影响。</p>
+        </div>
+        <div class="reveal feature-box">
+          <h3>智能决策辅助</h3>
+          <p>多智能体协同：员工Agent(毫秒) → 部门Agent(秒) → 项目Agent(小时) 三级响应。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 5: MULTI-AGENT ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">多智能体协同系统</h2>
+    <div class="three-col">
+      <div class="reveal stat-card">
+        <div class="number">1247</div>
+        <div class="label">员工 Agent</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:6px">个人数字孪生 · 毫秒级响应</p>
+        <p style="font-size:11px;color:var(--text-muted)">任务提醒 · 阈值告警</p>
+      </div>
+      <div class="reveal stat-card">
+        <div class="number">12</div>
+        <div class="label">部门 Agent</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:6px">团队数字孪生 · 秒级协同</p>
+        <p style="font-size:11px;color:var(--text-muted)">资源优化 · 协作分析</p>
+      </div>
+      <div class="reveal stat-card">
+        <div class="number">47</div>
+        <div class="label">项目 Agent</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:6px">全链路仿真 · 小时级优化</p>
+        <p style="font-size:11px;color:var(--text-muted)">决策推演 · 战略规划</p>
+      </div>
+    </div>
+    <p class="reveal" style="color:var(--text-muted);font-size:var(--small-size);text-align:center;margin-top:var(--content-gap)">
+      协同机制：合同网协议（任务分配）+ VCG拍卖（资源配置）+ 市场博弈（复杂决策）
+    </p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 6: VALUE ===== -->
+<section class="slide dark-alt">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">为每个角色创造价值</h2>
+    <div class="icon-row">
+      <div class="reveal icon-box">
+        <div class="circle gold">👔</div>
+        <div class="title">高管</div>
+        <div class="desc">一眼看到全机构状态<br>What-If 推演决策<br>组织健康度报告</div>
+      </div>
+      <div class="reveal icon-box">
+        <div class="circle blue">📋</div>
+        <div class="title">部门经理</div>
+        <div class="desc">团队负载可视化<br>瓶颈自动识别<br>智能任务分配</div>
+      </div>
+      <div class="reveal icon-box">
+        <div class="circle gold">💼</div>
+        <div class="title">员工</div>
+        <div class="desc">个人Agent助手<br>智能待办提醒<br>协作路径导航</div>
+      </div>
+      <div class="reveal icon-box">
+        <div class="circle blue">🛡</div>
+        <div class="title">合规官</div>
+        <div class="desc">区块链审计追踪<br>AI决策透明化<br>合规实时监控</div>
+      </div>
+      <div class="reveal icon-box">
+        <div class="circle gold">⚡</div>
+        <div class="title">风控官</div>
+        <div class="desc">跨部门风险预警<br>信息隔离墙监控<br>流程阻断能力</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 7: TECH ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">技术优势</h2>
+    <div class="two-col">
+      <div>
+        <div class="reveal feature-box" style="margin-bottom:var(--element-gap)">
+          <h3>三级AI推理</h3>
+          <p style="margin-bottom:8px"><span class="tag gold">边缘</span> 量化模型 + 规则引擎 · &lt;100ms</p>
+          <p style="margin-bottom:8px"><span class="tag blue">区域</span> GPT-4 + RAG + 多Agent · &lt;5s</p>
+          <p><span class="tag gold">云端</span> 联邦学习 + 强化学习 · &lt;1h</p>
+        </div>
+        <div class="reveal feature-box">
+          <h3>WebGPU 渲染</h3>
+          <p>性能是 WebGL 的 2-10 倍。2026年覆盖率 70-80%。弱网自动降级 2D，日常 50 人 60fps，重要汇报 100+ 云端推流。</p>
+        </div>
+      </div>
+      <div>
+        <div class="reveal feature-box" style="margin-bottom:var(--element-gap)">
+          <h3>联邦学习 · 数据不出域</h3>
+          <p>各机构本地训练，只传梯度不传数据。同态加密 + 差分隐私双重保护。金融行业最高合规标准。</p>
+        </div>
+        <div class="reveal feature-box">
+          <h3>FIBO 金融本体</h3>
+          <p>金融行业标准知识图谱。语义级理解金融业务实体和关系。区别于通用AI的差异化壁垒。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 8: BUSINESS ===== -->
+<section class="slide dark-alt">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">商业化策略</h2>
+    <div class="two-col">
+      <div>
+        <div class="reveal stat-card" style="margin-bottom:var(--element-gap)">
+          <div class="number" style="font-size:clamp(1.5rem,3vw,2.2rem);color:var(--text-primary)">¥50-500万</div>
+          <div class="label">私有化授权费（按规模/模块）</div>
+        </div>
+        <div class="reveal stat-card">
+          <div class="number" style="font-size:clamp(1.5rem,3vw,2.2rem);color:var(--text-primary)">15-20%</div>
+          <div class="label">年服务费（含更新/维护/AI迭代）</div>
+        </div>
+      </div>
+      <div class="reveal">
+        <h3 style="font-family:var(--font-display);color:var(--gold);font-size:var(--h3-size);margin-bottom:12px">灯塔客户策略</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="phase">第一阶段</div>
+            <div class="desc">国有大行（1-2家）</div>
+          </div>
+          <div class="timeline-item">
+            <div class="phase">第二阶段</div>
+            <div class="desc">头部券商（3-5家）</div>
+          </div>
+          <div class="timeline-item">
+            <div class="phase">第三阶段</div>
+            <div class="desc">城商行/基金公司</div>
+          </div>
+          <div class="timeline-item">
+            <div class="phase">第四阶段</div>
+            <div class="desc">中小金融机构</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 9: ROADMAP ===== -->
+<section class="slide">
+  <div class="slide-content">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--content-gap)">实施路线</h2>
+    <table class="reveal data-table">
+      <thead>
+        <tr><th>阶段</th><th>时间</th><th>交付物</th><th>里程碑</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag gold">Alpha</span></td>
+          <td>M1-M3</td>
+          <td>数据接入 + 3D大楼 + 边缘AI</td>
+          <td>数据织物层上线，个人Agent可用</td>
+        </tr>
+        <tr>
+          <td><span class="tag blue">Beta</span></td>
+          <td>M4-M6</td>
+          <td>行为建模 + 三级推理</td>
+          <td>1家灯塔客户试点</td>
+        </tr>
+        <tr>
+          <td><span class="tag gold">v1.0</span></td>
+          <td>M7-M9</td>
+          <td>完整五层架构 + 5角色</td>
+          <td>3家灯塔客户正式上线</td>
+        </tr>
+        <tr>
+          <td><span class="tag blue">v1.5</span></td>
+          <td>M10-M12</td>
+          <td>联邦学习 + 区块链审计</td>
+          <td>多机构部署，生态扩展</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="reveal" style="color:var(--text-muted);font-size:var(--small-size);margin-top:var(--content-gap)">
+      目标：12个月完成从零到商业化落地
+    </p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 10: CLOSING ===== -->
+<section class="slide title-slide">
+  <div class="bg-glow gold" style="top:30%;left:30%"></div>
+  <div class="slide-content center">
+    <h2 class="reveal display" style="font-size:var(--h2-size);color:var(--gold);margin-bottom:var(--element-gap)">问答环节</h2>
+    <div class="reveal divider"></div>
+    <p class="reveal subtitle" style="font-size:var(--body-size)">
+      让每一份工作流，都可见、可预测、可优化
+    </p>
+    <p class="reveal" style="color:var(--text-muted);font-size:var(--small-size);margin-top:var(--content-gap)">
+      NexusAI · 金融行业工作流数字孪生平台
+    </p>
+    <p class="reveal" style="color:var(--text-muted);font-size:11px;margin-top:4px">
+      私有化部署 · 等保三级 · 区块链审计 · 联邦学习
+    </p>
+  </div>
+</section>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   =========================================== */
+class SlidePresentation{
+  constructor(){
+    this.slides = document.querySelectorAll('.slide');
+    this.currentSlide = 0;
+    this.totalSlides = this.slides.length;
+    this.progressBar = document.getElementById('progressBar');
+    this.navDots = document.getElementById('navDots');
+    this.buildNavDots();
+    this.setupIntersectionObserver();
+    this.setupKeyboardNav();
+    this.setupWheelNav();
+    this.setupTouchNav();
+    this.markVisible(0);
+  }
+
+  buildNavDots(){
+    this.navDots.innerHTML = '';
+    for(let i=0;i<this.totalSlides;i++){
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i===0?' active':'');
+      dot.addEventListener('click',()=>this.goTo(i));
+      this.navDots.appendChild(dot);
+    }
+  }
+
+  setupIntersectionObserver(){
+    const options = {root:null,threshold:0.4};
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          const idx = Array.from(this.slides).indexOf(entry.target);
+          if(idx>=0){this.currentSlide=idx;this.markVisible(idx)}
+        }
+      });
+    },options);
+    this.slides.forEach(s=>observer.observe(s));
+  }
+
+  markVisible(idx){
+    const dots = this.navDots.querySelectorAll('.dot');
+    dots.forEach((d,i)=>{
+      d.classList.toggle('active',i===idx);
+    });
+    this.progressBar.style.width = ((idx+1)/this.totalSlides*100)+'%';
+    // Add visible class for animations
+    this.slides.forEach((s,i)=>{
+      if(i===idx||i===idx-1||i===idx+1){
+        s.classList.add('visible');
+      }
+    });
+  }
+
+  setupKeyboardNav(){
+    document.addEventListener('keydown',(e)=>{
+      if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){
+        e.preventDefault();
+        this.goTo(Math.min(this.currentSlide+1,this.totalSlides-1));
+      }else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){
+        e.preventDefault();
+        this.goTo(Math.max(this.currentSlide-1,0));
+      }else if(e.key==='Home'){
+        e.preventDefault();this.goTo(0);
+      }else if(e.key==='End'){
+        e.preventDefault();this.goTo(this.totalSlides-1);
+      }
+    });
+  }
+
+  setupWheelNav(){
+    let wheelTimeout;
+    document.addEventListener('wheel',(e)=>{
+      if(wheelTimeout)return;
+      wheelTimeout = setTimeout(()=>{wheelTimeout=null},800);
+      if(e.deltaY>30){
+        this.goTo(Math.min(this.currentSlide+1,this.totalSlides-1));
+      }else if(e.deltaY<-30){
+        this.goTo(Math.max(this.currentSlide-1,0));
+      }
+    },{passive:true});
+  }
+
+  setupTouchNav(){
+    let touchStartY=0;
+    document.addEventListener('touchstart',(e)=>{
+      touchStartY = e.touches[0].clientY;
+    },{passive:true});
+    document.addEventListener('touchend',(e)=>{
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      if(Math.abs(dy)>50){
+        if(dy>0)this.goTo(Math.min(this.currentSlide+1,this.totalSlides-1));
+        else this.goTo(Math.max(this.currentSlide-1,0));
+      }
+    });
+  }
+
+  goTo(idx){
+    if(idx<0||idx>=this.totalSlides)return;
+    this.slides[idx].scrollIntoView({behavior:'smooth'});
+    this.currentSlide = idx;
+    this.markVisible(idx);
+  }
+}
+
+new SlidePresentation();
+</script>
+</body>
+</html>

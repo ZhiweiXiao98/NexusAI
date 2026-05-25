@@ -1,0 +1,307 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 920">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+    <filter id="glow-blue">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-gold">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+    </marker>
+    <marker id="arrow-gold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24"/>
+    </marker>
+    <marker id="arrow-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa"/>
+    </marker>
+    <marker id="arrow-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185"/>
+    </marker>
+    <marker id="arrow-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/>
+    </marker>
+    <marker id="arrow-slate" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+    text { font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace; }
+  </style>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0f172a"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+
+  <!-- Title -->
+  <text x="40" y="38" fill="#fbbf24" font-size="18" font-weight="700">NexusAI</text>
+  <text x="160" y="38" fill="#94a3b8" font-size="14" font-weight="500">金融行业工作流数字孪生平台 — 技术架构全景</text>
+
+  <!-- ===== LEFT: Security & Compliance Column ===== -->
+  <rect x="20" y="70" width="120" height="620" rx="10" fill="none" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="80" y="92" fill="#fb7185" font-size="9" font-weight="600" text-anchor="middle">安全合规</text>
+
+  <!-- Security items -->
+  <rect x="30" y="110" width="100" height="36" rx="4" fill="rgba(136,19,55,0.35)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="80" y="132" fill="#fca5a5" font-size="10" font-weight="600" text-anchor="middle">等保三级</text>
+
+  <rect x="30" y="158" width="100" height="36" rx="4" fill="rgba(136,19,55,0.35)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="80" y="180" fill="#fca5a5" font-size="10" font-weight="600" text-anchor="middle">GDPR</text>
+
+  <rect x="30" y="206" width="100" height="36" rx="4" fill="rgba(136,19,55,0.35)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="80" y="228" fill="#fca5a5" font-size="9" font-weight="600" text-anchor="middle">区块链审计</text>
+
+  <rect x="30" y="254" width="100" height="36" rx="4" fill="rgba(136,19,55,0.35)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="80" y="276" fill="#fca5a5" font-size="10" font-weight="600" text-anchor="middle">联邦学习</text>
+
+  <rect x="30" y="302" width="100" height="36" rx="4" fill="rgba(136,19,55,0.35)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="80" y="324" fill="#fca5a5" font-size="9" font-weight="600" text-anchor="middle">数据不出域</text>
+
+  <!-- Security vertical connector line -->
+  <line x1="80" y1="350" x2="80" y2="680" stroke="#fb7185" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- ===== ROW 1: 体验编排层 ===== -->
+  <rect x="170" y="70" width="1200" height="110" rx="8" fill="none" stroke="#3b82f6" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="186" y="90" fill="#60a5fa" font-size="11" font-weight="700">体验编排层</text>
+  <text x="290" y="90" fill="#64748b" font-size="9" font-weight="400">— 角色驱动的3D虚拟办公室</text>
+
+  <!-- Role boxes -->
+  <rect x="190" y="106" width="100" height="28" rx="4" fill="#0f172a"/>
+  <rect x="190" y="106" width="100" height="28" rx="4" fill="rgba(59,130,246,0.25)" stroke="#60a5fa" stroke-width="1"/>
+  <text x="240" y="124" fill="#bfdbfe" font-size="10" font-weight="600" text-anchor="middle">高管驾驶舱</text>
+
+  <rect x="310" y="106" width="100" height="28" rx="4" fill="#0f172a"/>
+  <rect x="310" y="106" width="100" height="28" rx="4" fill="rgba(59,130,246,0.25)" stroke="#60a5fa" stroke-width="1"/>
+  <text x="360" y="124" fill="#bfdbfe" font-size="10" font-weight="600" text-anchor="middle">经理工作台</text>
+
+  <rect x="430" y="106" width="100" height="28" rx="4" fill="#0f172a"/>
+  <rect x="430" y="106" width="100" height="28" rx="4" fill="rgba(59,130,246,0.25)" stroke="#60a5fa" stroke-width="1"/>
+  <text x="480" y="124" fill="#bfdbfe" font-size="10" font-weight="600" text-anchor="middle">员工工作站</text>
+
+  <rect x="550" y="106" width="100" height="28" rx="4" fill="#0f172a"/>
+  <rect x="550" y="106" width="100" height="28" rx="4" fill="rgba(59,130,246,0.25)" stroke="#60a5fa" stroke-width="1"/>
+  <text x="600" y="124" fill="#bfdbfe" font-size="10" font-weight="600" text-anchor="middle">合规审查台</text>
+
+  <rect x="670" y="106" width="100" height="28" rx="4" fill="#0f172a"/>
+  <rect x="670" y="106" width="100" height="28" rx="4" fill="rgba(59,130,246,0.25)" stroke="#60a5fa" stroke-width="1"/>
+  <text x="720" y="124" fill="#bfdbfe" font-size="10" font-weight="600" text-anchor="middle">风控中心</text>
+
+  <!-- Arrow from roles to 3D -->
+  <path d="M 770 120 L 790 120" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+
+  <!-- 3D Virtual Office -->
+  <rect x="820" y="100" width="300" height="40" rx="6" fill="#0f172a"/>
+  <rect x="820" y="100" width="300" height="40" rx="6" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="970" y="118" fill="white" font-size="11" font-weight="600" text-anchor="middle">3D 虚拟办公室</text>
+  <text x="970" y="134" fill="#93c5fd" font-size="8" text-anchor="middle">三层映射: 部门楼层 → 项目视图 → 工作流管道</text>
+
+  <!-- Descending arrows between layers -->
+  <line x1="1040" y1="140" x2="1040" y2="190" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ===== ROW 2: 决策智能层 ===== -->
+  <rect x="170" y="190" width="1200" height="120" rx="8" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="186" y="212" fill="#fbbf24" font-size="11" font-weight="700">决策智能层</text>
+  <text x="290" y="212" fill="#64748b" font-size="9" font-weight="400">— 三级AI推理引擎 + 多智能体协同</text>
+
+  <!-- Edge AI -->
+  <rect x="190" y="228" width="280" height="66" rx="6" fill="#0f172a"/>
+  <rect x="190" y="228" width="280" height="66" rx="6" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="330" y="250" fill="#fde68a" font-size="11" font-weight="600" text-anchor="middle">边缘推理 (毫秒级)</text>
+  <text x="330" y="268" fill="#94a3b8" font-size="8" text-anchor="middle">量化模型 + 规则引擎</text>
+  <text x="330" y="284" fill="#64748b" font-size="8" text-anchor="middle">瓶颈预警 / 任务提醒 / 阈值告警</text>
+
+  <!-- Arrow -->
+  <path d="M 470 261 L 500 261" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow-gold)"/>
+
+  <!-- Regional AI -->
+  <rect x="510" y="228" width="280" height="66" rx="6" fill="#0f172a"/>
+  <rect x="510" y="228" width="280" height="66" rx="6" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="650" y="250" fill="#fde68a" font-size="11" font-weight="600" text-anchor="middle">区域推理 (秒级)</text>
+  <text x="650" y="268" fill="#94a3b8" font-size="8" text-anchor="middle">GPT-4 + RAG + 多Agent协同</text>
+  <text x="650" y="284" fill="#64748b" font-size="8" text-anchor="middle">资源优化 / 协作分析 / 瓶颈识别</text>
+
+  <!-- Arrow -->
+  <path d="M 790 261 L 820 261" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow-gold)"/>
+
+  <!-- Cloud AI -->
+  <rect x="830" y="228" width="280" height="66" rx="6" fill="#0f172a"/>
+  <rect x="830" y="228" width="280" height="66" rx="6" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="970" y="250" fill="#fde68a" font-size="11" font-weight="600" text-anchor="middle">云端推理 (小时级)</text>
+  <text x="970" y="268" fill="#94a3b8" font-size="8" text-anchor="middle">联邦学习 + 强化学习</text>
+  <text x="970" y="284" fill="#64748b" font-size="8" text-anchor="middle">决策推演 / 战略规划 / 组织优化</text>
+
+  <!-- Multi-agent system indicator -->
+  <rect x="1140" y="235" width="100" height="52" rx="6" fill="#0f172a"/>
+  <rect x="1140" y="235" width="100" height="52" rx="6" fill="rgba(251,191,36,0.1)" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="1190" y="255" fill="#fde68a" font-size="9" font-weight="600" text-anchor="middle">多智能体</text>
+  <text x="1190" y="272" fill="#94a3b8" font-size="7" text-anchor="middle">员工Agent</text>
+  <text x="1190" y="283" fill="#94a3b8" font-size="7" text-anchor="middle">部门Agent</text>
+
+  <!-- Descending arrows -->
+  <line x1="650" y1="294" x2="650" y2="320" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ===== ROW 3: 仿真环境层 ===== -->
+  <rect x="170" y="320" width="1200" height="110" rx="8" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="186" y="342" fill="#a78bfa" font-size="11" font-weight="700">仿真环境层</text>
+  <text x="290" y="342" fill="#64748b" font-size="9" font-weight="400">— 混合渲染引擎 + 生成式3D</text>
+
+  <rect x="190" y="358" width="200" height="56" rx="6" fill="#0f172a"/>
+  <rect x="190" y="358" width="200" height="56" rx="6" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.2"/>
+  <text x="290" y="380" fill="#ddd6fe" font-size="11" font-weight="600" text-anchor="middle">Three.js 渲染引擎</text>
+  <text x="290" y="398" fill="#94a3b8" font-size="8" text-anchor="middle">WebGPU 优先 / WebGL 兜底</text>
+  <text x="290" y="410" fill="#64748b" font-size="7" text-anchor="middle">性能提升 2-10x</text>
+
+  <rect x="420" y="358" width="200" height="56" rx="6" fill="#0f172a"/>
+  <rect x="420" y="358" width="200" height="56" rx="6" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.2"/>
+  <text x="520" y="380" fill="#ddd6fe" font-size="11" font-weight="600" text-anchor="middle">生成式3D建模</text>
+  <text x="520" y="398" fill="#94a3b8" font-size="8" text-anchor="middle">AI 生成粗模 + 人工精修</text>
+  <text x="520" y="410" fill="#64748b" font-size="7" text-anchor="middle">从 0 到 0.6 快速搭建</text>
+
+  <rect x="650" y="358" width="200" height="56" rx="6" fill="#0f172a"/>
+  <rect x="650" y="358" width="200" height="56" rx="6" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1.2"/>
+  <text x="750" y="380" fill="#ddd6fe" font-size="11" font-weight="600" text-anchor="middle">混合云渲染</text>
+  <text x="750" y="398" fill="#94a3b8" font-size="8" text-anchor="middle">客户端 GPU + 云端推流</text>
+  <text x="750" y="410" fill="#64748b" font-size="7" text-anchor="middle">弱网自动降级 2D</text>
+
+  <!-- Additional info boxes -->
+  <rect x="880" y="358" width="150" height="56" rx="6" fill="#0f172a"/>
+  <rect x="880" y="358" width="150" height="56" rx="6" fill="rgba(167,139,250,0.08)" stroke="#a78bfa" stroke-width="0.8"/>
+  <text x="955" y="378" fill="#c4b5fd" font-size="9" font-weight="600" text-anchor="middle">场景管理</text>
+  <text x="955" y="395" fill="#94a3b8" font-size="8" text-anchor="middle">部门楼层</text>
+  <text x="955" y="408" fill="#94a3b8" font-size="8" text-anchor="middle">项目视图 + 管道</text>
+
+  <rect x="1050" y="358" width="150" height="56" rx="6" fill="#0f172a"/>
+  <rect x="1050" y="358" width="150" height="56" rx="6" fill="rgba(167,139,250,0.08)" stroke="#a78bfa" stroke-width="0.8"/>
+  <text x="1125" y="378" fill="#c4b5fd" font-size="9" font-weight="600" text-anchor="middle">性能指标</text>
+  <text x="1125" y="395" fill="#94a3b8" font-size="8" text-anchor="middle">20-50 人 60fps</text>
+  <text x="1125" y="408" fill="#94a3b8" font-size="8" text-anchor="middle">100+ 推流 30fps</text>
+
+  <!-- Descending arrows -->
+  <line x1="650" y1="414" x2="650" y2="440" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ===== ROW 4: 行为建模层 ===== -->
+  <rect x="170" y="440" width="1200" height="110" rx="8" fill="none" stroke="#34d399" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="186" y="462" fill="#34d399" font-size="11" font-weight="700">行为建模层</text>
+  <text x="290" y="462" fill="#64748b" font-size="9" font-weight="400">— 金融智能模型 + 知识图谱</text>
+
+  <rect x="190" y="478" width="300" height="56" rx="6" fill="#0f172a"/>
+  <rect x="190" y="478" width="300" height="56" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="340" y="500" fill="#d1fae5" font-size="11" font-weight="600" text-anchor="middle">GNN 图神经网络</text>
+  <text x="340" y="518" fill="#94a3b8" font-size="8" text-anchor="middle">分析跨部门协作关系图谱</text>
+  <text x="340" y="530" fill="#64748b" font-size="7" text-anchor="middle">识别信息孤岛 · 协作瓶颈 · 关键节点</text>
+
+  <rect x="520" y="478" width="300" height="56" rx="6" fill="#0f172a"/>
+  <rect x="520" y="478" width="300" height="56" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="670" y="500" fill="#d1fae5" font-size="11" font-weight="600" text-anchor="middle">Transformer 任务识别</text>
+  <text x="670" y="518" fill="#94a3b8" font-size="8" text-anchor="middle">识别任务执行模式 · 预测工时</text>
+  <text x="670" y="530" fill="#64748b" font-size="7" text-anchor="middle">模式匹配 · 异常检测 · 风险分级</text>
+
+  <rect x="850" y="478" width="300" height="56" rx="6" fill="#0f172a"/>
+  <rect x="850" y="478" width="300" height="56" rx="6" fill="rgba(52,211,153,0.12)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="1000" y="500" fill="#d1fae5" font-size="11" font-weight="600" text-anchor="middle">FIBO 金融行业本体</text>
+  <text x="1000" y="518" fill="#94a3b8" font-size="8" text-anchor="middle">金融领域知识图谱 + 语义推理</text>
+  <text x="1000" y="530" fill="#64748b" font-size="7" text-anchor="middle">实体链接 · 关系推理 · 合规约束</text>
+
+  <!-- Descending arrows -->
+  <line x1="650" y1="534" x2="650" y2="560" stroke="#64748b" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ===== ROW 5: 数据织物层 ===== -->
+  <rect x="170" y="560" width="1200" height="130" rx="8" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="186" y="582" fill="#94a3b8" font-size="11" font-weight="700">数据织物层</text>
+  <text x="290" y="582" fill="#64748b" font-size="9" font-weight="400">— 全域数据接入 + 隐私计算</text>
+
+  <!-- LakeHouse + CDC -->
+  <rect x="190" y="598" width="240" height="36" rx="4" fill="#0f172a"/>
+  <rect x="190" y="598" width="240" height="36" rx="4" fill="rgba(148,163,184,0.12)" stroke="#94a3b8" stroke-width="1"/>
+  <text x="310" y="620" fill="#e2e8f0" font-size="10" font-weight="600" text-anchor="middle">LakeHouse + Flink CDC 实时同步</text>
+
+  <!-- Data sources -->
+  <rect x="460" y="598" width="95" height="36" rx="4" fill="#0f172a"/>
+  <rect x="460" y="598" width="95" height="36" rx="4" fill="rgba(148,163,184,0.1)" stroke="#64748b" stroke-width="0.8"/>
+  <text x="507" y="620" fill="#cbd5e1" font-size="9" font-weight="600" text-anchor="middle">Wind 万得</text>
+
+  <rect x="565" y="598" width="95" height="36" rx="4" fill="#0f172a"/>
+  <rect x="565" y="598" width="95" height="36" rx="4" fill="rgba(148,163,184,0.1)" stroke="#64748b" stroke-width="0.8"/>
+  <text x="612" y="620" fill="#cbd5e1" font-size="9" font-weight="600" text-anchor="middle">恒生电子</text>
+
+  <rect x="670" y="598" width="110" height="36" rx="4" fill="#0f172a"/>
+  <rect x="670" y="598" width="110" height="36" rx="4" fill="rgba(148,163,184,0.1)" stroke="#64748b" stroke-width="0.8"/>
+  <text x="725" y="620" fill="#cbd5e1" font-size="8" font-weight="600" text-anchor="middle">企微/飞书/钉钉</text>
+
+  <rect x="790" y="598" width="100" height="36" rx="4" fill="#0f172a"/>
+  <rect x="790" y="598" width="100" height="36" rx="4" fill="rgba(148,163,184,0.1)" stroke="#64748b" stroke-width="0.8"/>
+  <text x="840" y="620" fill="#cbd5e1" font-size="9" font-weight="600" text-anchor="middle">Teams</text>
+
+  <rect x="900" y="598" width="80" height="36" rx="4" fill="#0f172a"/>
+  <rect x="900" y="598" width="80" height="36" rx="4" fill="rgba(148,163,184,0.1)" stroke="#64748b" stroke-width="0.8"/>
+  <text x="940" y="620" fill="#cbd5e1" font-size="9" font-weight="600" text-anchor="middle">Jira</text>
+
+  <rect x="990" y="598" width="100" height="36" rx="4" fill="#0f172a"/>
+  <rect x="990" y="598" width="100" height="36" rx="4" fill="rgba(148,163,184,0.1)" stroke="#64748b" stroke-width="0.8"/>
+  <text x="1040" y="620" fill="#cbd5e1" font-size="9" font-weight="600" text-anchor="middle">邮件系统</text>
+
+  <!-- Privacy computation -->
+  <rect x="190" y="646" width="180" height="30" rx="4" fill="#0f172a"/>
+  <rect x="190" y="646" width="180" height="30" rx="4" fill="rgba(136,19,55,0.15)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="280" y="665" fill="#fca5a5" font-size="9" font-weight="600" text-anchor="middle">同态加密 + 差分隐私</text>
+
+  <rect x="390" y="646" width="180" height="30" rx="4" fill="#0f172a"/>
+  <rect x="390" y="646" width="180" height="30" rx="4" fill="rgba(136,19,55,0.15)" stroke="#fb7185" stroke-width="0.8"/>
+  <text x="480" y="665" fill="#fca5a5" font-size="9" font-weight="600" text-anchor="middle">联邦学习 · 数据不出域</text>
+
+  <!-- ===== BOTTOM: Commercialization Bar ===== -->
+  <rect x="20" y="720" width="1350" height="60" rx="8" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <rect x="20" y="720" width="1350" height="60" rx="8" fill="rgba(251,191,36,0.05)"/>
+
+  <text x="50" y="748" fill="#fbbf24" font-size="11" font-weight="700">商业化</text>
+
+  <rect x="160" y="733" width="140" height="34" rx="4" fill="#0f172a"/>
+  <rect x="160" y="733" width="140" height="34" rx="4" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="230" y="754" fill="#fde68a" font-size="9" font-weight="600" text-anchor="middle">私有化授权</text>
+
+  <text x="320" y="754" fill="#94a3b8" font-size="9">50-500 万（按规模/模块）</text>
+
+  <rect x="570" y="733" width="120" height="34" rx="4" fill="#0f172a"/>
+  <rect x="570" y="733" width="120" height="34" rx="4" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="630" y="754" fill="#fde68a" font-size="9" font-weight="600" text-anchor="middle">年服务费</text>
+
+  <text x="710" y="754" fill="#94a3b8" font-size="9">授权费的 15-20%</text>
+
+  <rect x="880" y="733" width="140" height="34" rx="4" fill="#0f172a"/>
+  <rect x="880" y="733" width="140" height="34" rx="4" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-width="0.8"/>
+  <text x="950" y="754" fill="#fde68a" font-size="9" font-weight="600" text-anchor="middle">灯塔客户策略</text>
+
+  <text x="1040" y="754" fill="#94a3b8" font-size="8">国有大行 → 头部券商 → 城商行/基金 → 中小机构</text>
+
+  <!-- ===== Legend ===== -->
+  <rect x="20" y="800" width="1350" height="50" rx="6" fill="none" stroke="#1e293b" stroke-width="1"/>
+  <text x="40" y="822" fill="#64748b" font-size="9" font-weight="500">配色说明:</text>
+
+  <rect x="130" y="810" width="12" height="12" rx="2" fill="#3b82f6"/>
+  <text x="148" y="822" fill="#94a3b8" font-size="8">体验编排</text>
+
+  <rect x="230" y="810" width="12" height="12" rx="2" fill="#fbbf24"/>
+  <text x="248" y="822" fill="#94a3b8" font-size="8">决策智能</text>
+
+  <rect x="330" y="810" width="12" height="12" rx="2" fill="#a78bfa"/>
+  <text x="348" y="822" fill="#94a3b8" font-size="8">仿真环境</text>
+
+  <rect x="430" y="810" width="12" height="12" rx="2" fill="#34d399"/>
+  <text x="448" y="822" fill="#94a3b8" font-size="8">行为建模</text>
+
+  <rect x="530" y="810" width="12" height="12" rx="2" fill="#94a3b8"/>
+  <text x="548" y="822" fill="#94a3b8" font-size="8">数据织物</text>
+
+  <rect x="630" y="810" width="12" height="12" rx="2" fill="#fb7185"/>
+  <text x="648" y="822" fill="#94a3b8" font-size="8">安全合规</text>
+
+  <!-- Version info -->
+  <text x="1200" y="822" fill="#475569" font-size="8" text-anchor="middle">NexusAI v1.0 · 2026-05-25 · 机密</text>
+</svg>
