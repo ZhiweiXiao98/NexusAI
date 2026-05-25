@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAI · 金融数字孪生平台 v4</title>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1E3A5F;--blue:#3B82F6;--emerald:#10B981;--amber:#F59E0B;--red:#EF4444;
+  --bg-page:#F1F5F9;--bg-panel:#FFFFFF;--bg-scene:0xF1F5F9;
+  --text-primary:#1E293B;--text-secondary:#64748B;--text-muted:#94A3B8;
+  --border:#E2E8F0;--glass:rgba(255,255,255,0.72);--glass-blur:blur(18px);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04);--shadow-md:0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.08);--radius-sm:6px;--radius-md:10px;--radius-lg:14px;
+  --space-xs:4px;--space-sm:8px;--space-md:12px;--space-lg:16px;--space-xl:20px;--space-2xl:24px;
+  --font-display:'Playfair Display', Georgia, serif;--font-body:'DM Sans', -apple-system, sans-serif;
+  --font-mono:'JetBrains Mono', 'Fira Code', monospace;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);--ease-in-out:cubic-bezier(0.4,0,0.2,1);
+}
+body{
+  font-family:var(--font-body);background:var(--bg-page);color:var(--text-primary);
+  width:100vw;height:100vh;overflow:hidden;display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===== TOP BAR ===== */
+#topbar{
+  height:48px;min-height:48px;display:flex;align-items:center;padding:0 var(--space-xl);
+  background:var(--bg-panel);border-bottom:1px solid var(--border);z-index:100;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+}
+#topbar .logo{
+  font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--navy);
+  letter-spacing:-0.02em;margin-right:var(--space-2xl);
+}
+#topbar .logo span{color:var(--blue)}
+#topbar nav{display:flex;gap:var(--space-sm)}
+#topbar nav button{
+  padding:6px 14px;border:none;border-radius:var(--radius-sm);cursor:pointer;
+  font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--text-secondary);
+  background:transparent;transition:all 0.15s var(--ease-out);
+}
+#topbar nav button:hover{background:var(--bg-page);color:var(--text-primary)}
+#topbar nav button.active{background:rgba(59,130,246,0.1);color:var(--blue)}
+#topbar .spacer{flex:1}
+#topbar .status{
+  display:flex;align-items:center;gap:var(--space-sm);font-size:12px;color:var(--text-muted);
+}
+#topbar .status-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ===== MAIN LAYOUT ===== */
+#main{display:flex;flex:1;overflow:hidden}
+#sidebar-left{width:200px;min-width:200px;background:var(--bg-panel);border-right:1px solid var(--border);padding:var(--space-lg);overflow-y:auto;z-index:90}
+#viewport{flex:1;position:relative;overflow:hidden;background:#F1F5F9}
+#viewport canvas{display:block}
+#sidebar-right{width:280px;min-width:280px;background:var(--bg-panel);border-left:1px solid var(--border);padding:var(--space-lg);overflow-y:auto;z-index:90}
+
+/* ===== SIDEBAR LEFT ===== */
+#sidebar-left h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:var(--space-md)}
+.department-item{
+  padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-xs);border-radius:var(--radius-sm);
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);transition:all 0.15s var(--ease-out);
+  display:flex;align-items:center;gap:var(--space-sm);
+}
+.department-item:hover{background:var(--bg-page);color:var(--text-primary)}
+.department-item.active{background:rgba(59,130,246,0.08);color:var(--blue)}
+.department-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.department-item .badge{font-size:10px;font-weight:600;margin-left:auto;padding:1px 6px;border-radius:10px;background:var(--bg-page);color:var(--text-muted)}
+
+/* ===== SIDEBAR RIGHT ===== */
+#sidebar-right h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:var(--space-md)}
+.kpi-card{
+  background:var(--bg-page);border-radius:var(--radius-md);padding:var(--space-lg);margin-bottom:var(--space-md);
+  border:1px solid transparent;transition:all 0.2s var(--ease-out);
+}
+.kpi-card:hover{border-color:var(--border);box-shadow:var(--shadow-md)}
+.kpi-card .label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:var(--space-xs)}
+.kpi-card .value{font-family:var(--font-mono);font-size:26px;font-weight:700;color:var(--text-primary);line-height:1}
+.kpi-card .change{font-size:12px;margin-top:var(--space-xs);font-weight:500}
+.kpi-card .change.up{color:var(--emerald)}.kpi-card .change.down{color:var(--red)}
+.kpi-card .bar{height:3px;border-radius:2px;margin-top:var(--space-sm);background:var(--border);overflow:hidden}
+.kpi-card .bar-fill{height:100%;border-radius:2px;transition:width 0.6s var(--ease-out)}
+
+.alert-list{margin-top:var(--space-lg)}
+.alert-item{
+  padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-xs);border-radius:var(--radius-sm);
+  font-size:12px;display:flex;align-items:center;gap:var(--space-sm);border-left:3px solid transparent;
+}
+.alert-item.warn{border-left-color:var(--amber);background:rgba(245,158,11,0.05)}
+.alert-item.crit{border-left-color:var(--red);background:rgba(239,68,68,0.05)}
+.alert-item .severity{font-size:10px;font-weight:700;text-transform:uppercase;flex-shrink:0}
+.alert-item.warn .severity{color:var(--amber)}.alert-item.crit .severity{color:var(--red)}
+
+/* ===== VIEWPORT OVERLAYS ===== */
+.viewport-controls{
+  position:absolute;top:var(--space-md);left:var(--space-md);display:flex;gap:var(--space-xs);z-index:20;
+}
+.viewport-controls button{
+  padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;
+  font-family:var(--font-body);font-size:11px;font-weight:500;background:var(--glass);color:var(--text-secondary);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  transition:all 0.15s var(--ease-out);
+}
+.viewport-controls button:hover{background:var(--bg-panel);color:var(--text-primary)}
+.viewport-controls button.active{background:var(--navy);color:white;border-color:var(--navy)}
+
+.viewport-legend{
+  position:absolute;bottom:var(--space-md);left:var(--space-md);z-index:20;
+  display:flex;gap:var(--space-lg);font-size:11px;color:var(--text-muted);
+  background:var(--glass);padding:var(--space-sm) var(--space-md);border-radius:var(--radius-sm);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+}
+.viewport-legend span{display:flex;align-items:center;gap:4px}
+.viewport-legend .dot{width:6px;height:6px;border-radius:50%}
+
+.viewport-tooltip{
+  position:absolute;pointer-events:none;z-index:25;padding:var(--space-sm) var(--space-md);
+  background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:12px;font-weight:500;color:var(--text-primary);box-shadow:var(--shadow-lg);
+  opacity:0;transform:translate(-50%,-120%);transition:opacity 0.15s var(--ease-out);
+}
+.viewport-tooltip.visible{opacity:1}
+
+/* ===== BOTTOM BAR ===== */
+#bottombar{
+  height:28px;min-height:28px;display:flex;align-items:center;padding:0 var(--space-xl);
+  background:var(--bg-panel);border-top:1px solid var(--border);z-index:100;
+  font-size:11px;color:var(--text-muted);
+}
+#bottombar .time-slider{flex:1;margin:0 var(--space-xl);display:flex;align-items:center;gap:var(--space-sm)}
+#bottombar .time-slider input[type=range]{flex:1;accent-color:var(--blue);height:4px}
+#bottombar .agent-status{display:flex;gap:var(--space-md)}
+#bottombar .agent-status span{display:flex;align-items:center;gap:4px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo">Nexus<span>AI</span></div>
+  <nav>
+    <button class="active" data-view="overview">全景</button>
+    <button data-view="ibd">投行</button>
+    <button data-view="am">资管</button>
+    <button data-view="rm">风控</button>
+    <button data-view="meeting">会议</button>
+  </nav>
+  <div class="spacer"></div>
+  <div class="status"><span class="status-dot"></span>系统运行中 · 2026-05-26 14:32</div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar-left">
+    <h3>部门导航</h3>
+    <div class="department-item active" data-dept="all" data-color="#3B82F6">
+      <span class="dot" style="background:#3B82F6"></span>全局总览
+    </div>
+    <div class="department-item" data-dept="ibd" data-color="#3B82F6">
+      <span class="dot" style="background:#3B82F6"></span>投资银行部
+      <span class="badge">4人</span>
+    </div>
+    <div class="department-item" data-dept="am" data-color="#10B981">
+      <span class="dot" style="background:#10B981"></span>资产管理部
+      <span class="badge">3人</span>
+    </div>
+    <div class="department-item" data-dept="rm" data-color="#F59E0B">
+      <span class="dot" style="background:#F59E0B"></span>风险管理部
+      <span class="badge">2人</span>
+    </div>
+    <div class="department-item" data-dept="it" data-color="#1E3A5F">
+      <span class="dot" style="background:#1E3A5F"></span>信息技术部
+      <span class="badge">4人</span>
+    </div>
+    <div class="department-item" data-dept="comp" data-color="#3B82F6">
+      <span class="dot" style="background:#3B82F6"></span>合规部
+      <span class="badge">2人</span>
+    </div>
+  </div>
+
+  <!-- VIEWPORT -->
+  <div id="viewport">
+    <div class="viewport-controls">
+      <button class="active" data-preset="overview">全局</button>
+      <button data-preset="ibd">投行</button>
+      <button data-preset="am">资管</button>
+      <button data-preset="rm">风控</button>
+      <button data-preset="meeting">会议室</button>
+      <button data-preset="detail">近景</button>
+    </div>
+    <div class="viewport-legend">
+      <span><span class="dot" style="background:var(--blue)"></span> 正常</span>
+      <span><span class="dot" style="background:var(--amber)"></span> 预警</span>
+      <span><span class="dot" style="background:var(--red)"></span> 告警</span>
+    </div>
+    <div class="viewport-tooltip" id="tooltip"></div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div id="sidebar-right">
+    <h3>实时指标</h3>
+    <div class="kpi-card">
+      <div class="label">日交易量</div>
+      <div class="value">¥847.2M</div>
+      <div class="change up">↑ 12.4%</div>
+      <div class="bar"><div class="bar-fill" style="width:78%;background:var(--emerald)"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">活跃工作流</div>
+      <div class="value">2,847</div>
+      <div class="change up">↑ 8.7%</div>
+      <div class="bar"><div class="bar-fill" style="width:64%;background:var(--blue)"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">风险敞口 (VaR)</div>
+      <div class="value">¥32.4M</div>
+      <div class="change down">↓ 3.2%</div>
+      <div class="bar"><div class="bar-fill" style="width:42%;background:var(--amber)"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">系统可用率</div>
+      <div class="value">99.97%</div>
+      <div class="change up">±0%</div>
+      <div class="bar"><div class="bar-fill" style="width:96%;background:var(--emerald)"></div></div>
+    </div>
+    <h3 style="margin-top:var(--space-2xl)">告警列表</h3>
+    <div class="alert-list">
+      <div class="alert-item crit">
+        <span class="severity">P0</span> 风控部 · 流动性阈值触发
+      </div>
+      <div class="alert-item warn">
+        <span class="severity">P1</span> 投行部 · 数据同步延迟
+      </div>
+      <div class="alert-item warn">
+        <span class="severity">P2</span> IT部 · 磁盘使用率85%
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div id="bottombar">
+  <span>🕐 回放时间轴</span>
+  <div class="time-slider"><input type="range" min="0" max="100" value="100" id="timeSlider"><span>实时</span></div>
+  <div class="agent-status">
+    <span>🏦 投行 · <b style="color:var(--blue)">正常</b></span>
+    <span>📊 资管 · <b style="color:var(--emerald)">正常</b></span>
+    <span>🛡️ 风控 · <b style="color:var(--red)">告警</b></span>
+    <span>💻 IT · <b style="color:var(--blue)">正常</b></span>
+    <span>✅ 合规 · <b style="color:var(--emerald)">正常</b></span>
+  </div>
+</div>
+
+<!-- THREE.JS IMPORT -->
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ==============================
+   COLOR SYSTEM (Oklch-mapped)
+   ============================== */
+const C = {
+  navy:    0x1E3A5F,
+  blue:    0x3B82F6,
+  emerald: 0x10B981,
+  amber:   0xF59E0B,
+  red:     0xEF4444,
+  white:   0xFFFFFF,
+  wall:    0xF1F5F9,
+  floor:   0xE8DFD5,
+  wood:    0xC9A87C,
+  woodDark:0xA67B52,
+  deskTop: 0xF5F0EA,
+  metal:   0xCBD5E1,
+  glass:   0xE0EEFF,
+  grey200: 0xE2E8F0,
+  grey600: 0x475569,
+};
+
+/* ==============================
+   DEPARTMENT DEFINITIONS
+   ============================== */
+const DEPTS = [
+  { id:'ibd', name:'投资银行部', geo:'dodecahedron', color:C.blue,   status:'normal', pos:{x:-6.5,z:-5}, desks:4, desksLayout:[[-1.5,0],[1.5,0],[-1.5,2.5],[1.5,2.5]] },
+  { id:'am',  name:'资产管理部', geo:'octahedron',   color:C.emerald,status:'normal', pos:{x:3,z:-5},  desks:3, desksLayout:[[-1.5,0],[1.5,0],[0,2.5]] },
+  { id:'rm',  name:'风险管理部', geo:'icosahedron',  color:C.amber,  status:'alert', pos:{x:-6.5,z:2},  desks:2, desksLayout:[[-1,0],[1,0]] },
+  { id:'it',  name:'信息技术部', geo:'box',          color:C.navy,   status:'normal', pos:{x:3,z:2},   desks:4, desksLayout:[[-1.5,0],[1.5,0],[-1.5,2.5],[1.5,2.5]] },
+  { id:'comp',name:'合规部',     geo:'tetrahedron',  color:C.blue,   status:'normal',pos:{x:-6.5,z:6.5},desks:2, desksLayout:[[-1,0],[1,0]] },
+];
+
+/* ==============================
+   THREE.JS SETUP
+   ============================== */
+const viewport = document.getElementById('viewport');
+const W = viewport.clientWidth, H = viewport.clientHeight;
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+renderer.setSize(W,H); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+viewport.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(C.wall);
+scene.fog = new THREE.Fog(C.wall, 15, 35);
+
+// Orthographic isometric camera
+const frustumSize = 14;
+const aspect = W / H;
+const camera = new THREE.OrthographicCamera(
+  frustumSize * aspect / -2, frustumSize * aspect / 2,
+  frustumSize / 2, frustumSize / -2,
+  0.5, 50
+);
+// Default isometric position
+let camTarget = new THREE.Vector3(0, 0, 3);
+let camZoom = 1;
+function updateCamera() {
+  const z = 11 / camZoom;
+  camera.position.set(camTarget.x + z*0.7, camTarget.y + z*0.55, camTarget.z + z*0.7);
+  camera.lookAt(camTarget);
+  const a = viewport.clientWidth / viewport.clientHeight;
+  camera.left = frustumSize * a / -2 / camZoom;
+  camera.right = frustumSize * a / 2 / camZoom;
+  camera.top = frustumSize / 2 / camZoom;
+  camera.bottom = frustumSize / -2 / camZoom;
+  camera.updateProjectionMatrix();
+}
+updateCamera();
+
+/* ==============================
+   LIGHTING
+   ============================== */
+const ambient = new THREE.AmbientLight(0xF8FAFC, 1.8);
+scene.add(ambient);
+
+const hemi = new THREE.HemisphereLight(0xE0F0FF, 0xD0D0D0, 1.0);
+scene.add(hemi);
+
+const sun = new THREE.DirectionalLight(0xFFF8F0, 2.5);
+sun.position.set(12, 18, 6);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near=0.5; sun.shadow.camera.far=60;
+sun.shadow.camera.left=-20; sun.shadow.camera.right=20;
+sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
+sun.shadow.bias=-0.0001; sun.shadow.normalBias=0.02;
+scene.add(sun);
+
+/* ==============================
+   HELPER: CANVAS TEXTURES
+   ============================== */
+function woodTexture(w=512,h=512){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#E8DFD5';ctx.fillRect(0,0,w,h);
+  for(let i=0;i<40;i++){
+    const y=Math.random()*h, a=0.03+Math.random()*0.06;
+    ctx.strokeStyle=`rgba(166,123,82,${a})`;
+    ctx.lineWidth=1+Math.random()*3;ctx.beginPath();
+    ctx.moveTo(0,y);
+    for(let x=0;x<w;x+=16)ctx.lineTo(x,y+Math.sin(x*0.008)*4);
+    ctx.stroke();
+  }
+  // subtle knot details
+  for(let i=0;i<6;i++){
+    const kx=Math.random()*w,ky=Math.random()*h;
+    const grd=ctx.createRadialGradient(kx,ky,0,kx,ky,8+Math.random()*12);
+    grd.addColorStop(0,'rgba(139,90,43,0.12)');grd.addColorStop(1,'rgba(139,90,43,0)');
+    ctx.fillStyle=grd;ctx.fillRect(kx-20,ky-20,40,40);
+  }
+  return new THREE.CanvasTexture(c);
+}
+
+function deskTopTexture(w=256,h=128){
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#F5F0EA';ctx.fillRect(0,0,w,h);
+  for(let i=0;i<15;i++){
+    const y=Math.random()*h, a=0.02+Math.random()*0.04;
+    ctx.strokeStyle=`rgba(180,160,140,${a})`;
+    ctx.lineWidth=1;ctx.beginPath();
+    ctx.moveTo(0,y);
+    for(let x=0;x<w;x+=12)ctx.lineTo(x,y+Math.sin(x*0.02)*2);
+    ctx.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+}
+
+/* ==============================
+   MATERIALS
+   ============================== */
+const floorTex = woodTexture(); floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping; floorTex.repeat.set(2,1.5);
+const floorMat = new THREE.MeshStandardMaterial({map:floorTex, roughness:0.65, metalness:0, color:0xE8DFD5});
+
+const wallMat = new THREE.MeshStandardMaterial({color:C.wall, roughness:0.92, metalness:0});
+
+const deskTex = deskTopTexture();
+const deskTopMat = new THREE.MeshStandardMaterial({map:deskTex, roughness:0.55, metalness:0.02});
+const deskLegMat = new THREE.MeshStandardMaterial({color:C.metal, roughness:0.4, metalness:0.65});
+const chairMat = new THREE.MeshStandardMaterial({color:0x9CA3AF, roughness:0.85, metalness:0});
+
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color:C.glass, roughness:0.05, metalness:0, opacity:0.35, transparent:true,
+  envMapIntensity:0.4, clearcoat:0.1,
+});
+
+const glassFrameMat = new THREE.MeshStandardMaterial({color:C.metal, roughness:0.35, metalness:0.7});
+
+const screenMat = new THREE.MeshStandardMaterial({color:0x0A1628, roughness:0.2, metalness:0.1, emissive:0x0A1628, emissiveIntensity:0.3});
+const screenGlowMat = new THREE.MeshBasicMaterial({color:C.blue, opacity:0.12, transparent:true});
+
+/* ==============================
+   SCENE: FLOOR
+   ============================== */
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 15), floorMat);
+floor.rotation.x = -Math.PI/2; floor.position.set(0, -0.01, 1.5);
+floor.receiveShadow = true;
+scene.add(floor);
+
+// Floor border trim
+const trimGeo = new THREE.BoxGeometry(20.1, 0.06, 0.12);
+const trimMat = new THREE.MeshStandardMaterial({color:C.woodDark, roughness:0.5, metalness:0.05});
+function addTrim(x,z,rY){
+  const t = new THREE.Mesh(trimGeo, trimMat); t.position.set(x,-0.03,z); t.rotation.y=rY; t.receiveShadow=true; scene.add(t);
+}
+addTrim(0,-6,0); addTrim(0,9,0); addTrim(-10,1.5,Math.PI/2); addTrim(10,1.5,Math.PI/2);
+
+/* ==============================
+   SCENE: WALLS
+   ============================== */
+function addWall(x,z,w,h,rotY=0){
+  const geo = new THREE.BoxGeometry(w, h, 0.3);
+  const mesh = new THREE.Mesh(geo, wallMat);
+  mesh.position.set(x, h/2, z); mesh.rotation.y=rotY;
+  mesh.receiveShadow=true; mesh.castShadow=true;
+  scene.add(mesh);
+}
+// Far wall
+addWall(0, -6.15, 20, 3.2);
+// Left wall
+addWall(-10.15, 1.5, 0.3, 3.2, Math.PI/2, 15);
+// Right wall (partial)
+addWall(10.15, -3, 0.3, 3.2, Math.PI/2, 12);
+
+/* ==============================
+   SCENE: PARTITIONS (glass dividers)
+   ============================== */
+function addPartition(x,z,h=1.8,w=0.06,d=6,rotY=0){
+  const geo = new THREE.BoxGeometry(w,h,d); const mat = new THREE.MeshPhysicalMaterial({
+    color:0xEEF5FF, roughness:0.08, metalness:0, opacity:0.3, transparent:true,
+  });
+  const mesh = new THREE.Mesh(geo, mat); mesh.position.set(x,h/2,z); mesh.rotation.y=rotY;
+  mesh.receiveShadow=true; scene.add(mesh);
+}
+// Horizontal aisle divider
+addPartition(0, -0.5, 1.6, 0.06, 20);
+
+/* ==============================
+   SCENE: DESKS + CHAIRS + MONITORS
+   ============================== */
+function createDesk(baseX, baseZ){
+  const group = new THREE.Group();
+
+  // Desktop
+  const top = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.06, 0.75), deskTopMat);
+  top.position.y = 0.73; top.castShadow=true; top.receiveShadow=true;
+  group.add(top);
+
+  // Legs
+  for(let lx=-0.7;lx<=0.7;lx+=1.4){
+    for(let lz=-0.3;lz<=0.3;lz+=0.6){
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.05,0.73,0.05), deskLegMat);
+      leg.position.set(lx,0.365,lz); leg.castShadow=true;
+      group.add(leg);
+    }
+  }
+
+  // Monitor (back half)
+  const screen = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.36, 0.04), screenMat);
+  screen.position.set(-0.3, 1.0, -0.08); screen.castShadow=true;
+  group.add(screen);
+
+  // Monitor stand
+  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.18,0.1), deskLegMat);
+  stand.position.set(-0.3,0.85,-0.08); stand.castShadow=true;
+  group.add(stand);
+
+  // Screen content (colored glow)
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.45,0.28), new THREE.MeshBasicMaterial({
+    color:new THREE.Color().setHSL(0.58+Math.random()*0.05,0.7,0.4+Math.random()*0.2),
+    opacity:0.5, transparent:true,
+  }));
+  glow.position.set(-0.3, 1.0, -0.06);
+  group.add(glow);
+
+  group.position.set(baseX, 0, baseZ);
+  return group;
+}
+
+function createChair(baseX, baseZ){
+  const group = new THREE.Group();
+  // Seat
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.05,0.4), chairMat);
+  seat.position.y=0.45; seat.castShadow=true; group.add(seat);
+  // Back
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.35,0.04), chairMat);
+  back.position.set(0,0.65,-0.18); back.castShadow=true; group.add(back);
+  // Legs
+  for(let lx=-0.15;lx<=0.15;lx+=0.3){
+    for(let lz=-0.15;lz<=0.15;lz+=0.3){
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.03,0.45,0.03), deskLegMat);
+      leg.position.set(lx,0.225,lz); leg.castShadow=true; group.add(leg);
+    }
+  }
+  group.position.set(baseX, 0, baseZ);
+  return group;
+}
+
+/* ==============================
+   SCENE: MEETING ROOM
+   ============================== */
+function createMeetingRoom(){
+  const group = new THREE.Group();
+  const roomX=6, roomZ=6.5, roomW=5.5, roomD=3.5, roomH=2.5;
+
+  // Glass walls
+  const glassWallGeoH = new THREE.BoxGeometry(roomW, roomH, 0.08);
+  const glassWallGeoV = new THREE.BoxGeometry(0.08, roomH, roomD);
+
+  function addGlassWall(x,z,geo,ry=0){
+    const mesh = new THREE.Mesh(geo, glassMat);
+    mesh.position.set(x,roomH/2,z); mesh.rotation.y=ry;
+    mesh.receiveShadow=true; mesh.castShadow=true; group.add(mesh);
+  }
+  // 4 glass walls
+  addGlassWall(roomX, roomZ-roomD/2, glassWallGeoH);
+  addGlassWall(roomX, roomZ+roomD/2, glassWallGeoH);
+  addGlassWall(roomX-roomW/2, roomZ, glassWallGeoV);
+  addGlassWall(roomX+roomW/2, roomZ, glassWallGeoV);
+
+  // Metal frames
+  const frameV = new THREE.Mesh(new THREE.BoxGeometry(0.12,roomH,0.12), glassFrameMat);
+  const frameH = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,roomD), glassFrameMat);
+  [[roomX-roomW/2,roomZ-roomD/2],[roomX+roomW/2,roomZ-roomD/2],[roomX-roomW/2,roomZ+roomD/2],[roomX+roomW/2,roomZ+roomD/2]]
+    .forEach(([fx,fz])=>{
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.12,roomH,0.12), glassFrameMat);
+      p.position.set(fx,roomH/2,fz); p.castShadow=true; group.add(p);
+    });
+
+  // Conference table
+  const table = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.06,1.1), deskTopMat);
+  table.position.set(roomX,0.73,roomZ); table.castShadow=true; table.receiveShadow=true;
+  group.add(table);
+  // Table legs
+  for(let lx=-1;lx<=1;lx+=2){
+    for(let lz=-0.4;lz<=0.4;lz+=0.8){
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06,0.73,0.06), deskLegMat);
+      leg.position.set(roomX+lx,0.365,roomZ+lz); leg.castShadow=true; group.add(leg);
+    }
+  }
+
+  // Chairs around table
+  [[roomX-0.7,roomZ],[roomX+0.7,roomZ],[roomX,roomZ-0.6],[roomX,roomZ+0.6],[roomX-0.9,roomZ-0.45],[roomX+0.9,roomZ-0.45]]
+    .forEach(([cx,cz])=>{group.add(createChair(cx,cz));});
+
+  // Occupancy indicator - top light strip
+  const stripGeo = new THREE.BoxGeometry(roomW-0.3,0.04,0.12);
+  const strip = new THREE.Mesh(stripGeo, new THREE.MeshBasicMaterial({color:C.blue,opacity:0.7,transparent:true}));
+  strip.position.set(roomX,roomH-0.15,roomZ-roomD/2+0.2); group.add(strip);
+
+  // Projection on table
+  const proj = new THREE.Mesh(new THREE.PlaneGeometry(1.6,0.8), new THREE.MeshBasicMaterial({color:C.blue,opacity:0.1,transparent:true}));
+  proj.rotation.x=-Math.PI/2; proj.position.set(roomX,0.77,roomZ); group.add(proj);
+
+  return group;
+}
+
+/* ==============================
+   SCENE: RISK MONITORING WALL
+   ============================== */
+function createRiskWall(x,z){
+  const group = new THREE.Group();
+  // Back panel
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(4, 2.2, 0.15), new THREE.MeshStandardMaterial({
+    color:0x0A1628, roughness:0.3, metalness:0.3, emissive:0x0A1628, emissiveIntensity:0.4,
+  }));
+  panel.position.set(x,1.1,z); panel.castShadow=true; group.add(panel);
+
+  // Screen grid (3x2 monitors)
+  for(let sx=-1.5;sx<=1.5;sx+=1.5){
+    for(let sy=0.8;sy<=1.8;sy+=1.0){
+      const s = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.6), new THREE.MeshBasicMaterial({
+        color:new THREE.Color().setHSL(0.05+Math.random()*0.1,0.8,0.3+Math.random()*0.3),
+        opacity:0.7, transparent:true,
+      }));
+      s.position.set(x+sx, sy, z+0.08);
+      group.add(s);
+    }
+  }
+
+  // Floor red glow (alert)
+  const glowRing = new THREE.Mesh(new THREE.RingGeometry(1.4,1.6,48), new THREE.MeshBasicMaterial({
+    color:C.red, opacity:0.3, transparent:true, side:THREE.DoubleSide,
+  }));
+  glowRing.rotation.x=-Math.PI/2; glowRing.position.set(x,0.02,z);
+  group.add(glowRing);
+
+  return group;
+}
+
+/* ==============================
+   SCENE: GEOMETRIC AGENTS
+   ============================== */
+const agentGroups = [];
+function createAgent(dept){
+  const group = new THREE.Group();
+  let geo;
+  switch(dept.geo){
+    case 'dodecahedron': geo = new THREE.DodecahedronGeometry(0.35, 0); break;
+    case 'octahedron':   geo = new THREE.OctahedronGeometry(0.35, 0); break;
+    case 'icosahedron':  geo = new THREE.IcosahedronGeometry(0.35, 0); break;
+    case 'box':          geo = new THREE.BoxGeometry(0.45, 0.45, 0.45); break;
+    case 'tetrahedron':  geo = new THREE.TetrahedronGeometry(0.35, 0); break;
+    default:             geo = new THREE.IcosahedronGeometry(0.35, 0);
+  }
+
+  // Core
+  const coreMat = new THREE.MeshStandardMaterial({
+    color:dept.color, roughness:0.1, metalness:0.2,
+    emissive:dept.color, emissiveIntensity:0.4,
+  });
+  const core = new THREE.Mesh(geo, coreMat);
+  core.castShadow=true;
+  group.add(core);
+
+  // Outer glow ring
+  const ringGeo = new THREE.TorusGeometry(0.55, 0.04, 16, 48);
+  const ringMat = new THREE.MeshBasicMaterial({color:dept.color, opacity:0.5, transparent:true});
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x=Math.PI/2;
+  group.add(ring);
+
+  // Second ring (offset)
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.02, 16, 48), new THREE.MeshBasicMaterial({color:dept.color, opacity:0.25, transparent:true}));
+  ring2.rotation.x=Math.PI/2; ring2.rotation.z=Math.PI/3;
+  group.add(ring2);
+
+  // Base platform
+  const baseGeo = new THREE.CylinderGeometry(0.55, 0.6, 0.08, 32);
+  const base = new THREE.Mesh(baseGeo, deskLegMat);
+  base.position.y=-0.04; base.castShadow=true; base.receiveShadow=true;
+  group.add(base);
+
+  // Status indicator dot
+  const statusColors = { normal: C.emerald, alert: C.amber, critical: C.red };
+  const dotGeo = new THREE.SphereGeometry(0.08, 16, 16);
+  const dot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({color:statusColors[dept.status]||C.emerald}));
+  dot.position.y=0.65;
+  group.add(dot);
+
+  group.position.set(dept.pos.x, 1.3, dept.pos.z);
+  group.userData = { dept, core, ring, ring2, dot, status:dept.status };
+  scene.add(group);
+  agentGroups.push(group);
+  return group;
+}
+
+/* ==============================
+   SCENE: CORRIDOR LIGHT STRIP
+   ============================== */
+function createCorridor(){
+  const group = new THREE.Group();
+  // Light strip along center aisle
+  const stripGeo = new THREE.PlaneGeometry(18, 0.15);
+  const strip = new THREE.Mesh(stripGeo, new THREE.MeshBasicMaterial({color:C.blue, opacity:0.4, transparent:true}));
+  strip.rotation.x=-Math.PI/2; strip.position.set(0,0.005,-0.5);
+  group.add(strip);
+
+  // Data flow particles along corridor
+  const particles = [];
+  const particleGeo = new THREE.SphereGeometry(0.04, 8, 8);
+  for(let i=0;i<30;i++){
+    const mat = new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL(0.58,0.7,0.45+Math.random()*0.3), opacity:0.8, transparent:true});
+    const p = new THREE.Mesh(particleGeo, mat);
+    p.position.set((Math.random()-0.5)*17, 0.08, -0.5);
+    p.userData = { speed: 0.3+Math.random()*0.8, baseX: p.position.x };
+    group.add(p);
+    particles.push(p);
+  }
+
+  return { group, particles };
+}
+
+/* ==============================
+   SCENE: DECORATIVE ELEMENTS
+   ============================== */
+function createPottedPlant(x,z){
+  const g = new THREE.Group();
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.12,0.35,16), new THREE.MeshStandardMaterial({color:0xD4A574, roughness:0.55}));
+  pot.position.y=0.175; pot.castShadow=true; g.add(pot);
+  // Plant body
+  const plant = new THREE.Mesh(new THREE.SphereGeometry(0.18,8,8), new THREE.MeshStandardMaterial({color:0x2D6A2D, roughness:0.65}));
+  plant.position.y=0.5; plant.castShadow=true; g.add(plant);
+  g.position.set(x,0,z);
+  return g;
+}
+
+/* ==============================
+   SCENE: FLOATING DEPARTMENT LABELS
+   ============================== */
+function createLabelSprite(text, pos, colorHex){
+  const canvas = document.createElement('canvas');
+  canvas.width=256; canvas.height=64;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.beginPath();
+  ctx.roundRect(16,4,224,56,12); ctx.fill();
+  ctx.fillStyle=`#${colorHex.toString(16).padStart(6,'0')}`;
+  ctx.font='600 18px "DM Sans", sans-serif';
+  ctx.textAlign='center'; ctx.fillText(text,128,36);
+  const tex = new THREE.CanvasTexture(canvas);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false}));
+  sprite.position.copy(pos); sprite.position.y+=2.2; sprite.scale.set(4,1,1);
+  return sprite;
+}
+
+/* ==============================
+   BUILD SCENE
+   ============================== */
+// Desks + chairs for each department
+const allDesks = [];
+DEPTS.forEach(dept => {
+  dept.desksLayout.forEach(([dx,dz]) => {
+    const deskGroup = createDesk(dept.pos.x + dx, dept.pos.z + dz);
+    deskGroup.userData = { dept: dept.id, type: 'desk' };
+    scene.add(deskGroup);
+    allDesks.push(deskGroup);
+    // Chair behind each desk
+    scene.add(createChair(dept.pos.x + dx + 0.5, dept.pos.z + dz));
+  });
+});
+
+// Agents
+DEPTS.forEach(d => createAgent(d));
+
+// Meeting room
+scene.add(createMeetingRoom());
+
+// Risk wall
+scene.add(createRiskWall(-7.2, 1.5));
+
+// Corridor
+const corridorData = createCorridor();
+scene.add(corridorData.group);
+
+// Plants
+scene.add(createPottedPlant(-9,-5.5)); scene.add(createPottedPlant(9,-5.5));
+scene.add(createPottedPlant(-9,8.5)); scene.add(createPottedPlant(9,8.5));
+scene.add(createPottedPlant(-0.5,-5.5)); scene.add(createPottedPlant(0.5,8.5));
+
+// Department labels
+DEPTS.forEach(d => {
+  scene.add(createLabelSprite(d.name, new THREE.Vector3(d.pos.x, 0, d.pos.z), d.color));
+});
+
+/* ==============================
+   FLOATING KPI SPRITES ON DESKS
+   ============================== */
+const kpiData = ['+2.4%','¥847M','99.9%','14ms','✓'];
+allDesks.forEach((desk,i) => {
+  const c=document.createElement('canvas'); c.width=128; c.height=48;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='rgba(10,22,40,0.88)'; ctx.beginPath(); ctx.roundRect(4,2,120,44,8); ctx.fill();
+  ctx.fillStyle='#3B82F6'; ctx.font='600 16px "DM Sans", sans-serif'; ctx.textAlign='center';
+  ctx.fillText(kpiData[i%kpiData.length],64,34);
+  const tex = new THREE.CanvasTexture(c);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false}));
+  sprite.position.copy(desk.position); sprite.position.y+=1.15;
+  sprite.scale.set(0.9,0.34,1);
+  scene.add(sprite);
+});
+
+// 3D Scene Labels (CSS3D alternative – simpler sprites)
+// Already done via Canvas sprites above
+
+/* ==============================
+   RAYCASTER FOR INTERACTION
+   ============================== */
+const raycaster = new THREE.Raycaster();
+raycaster.far = 20;
+const mouse = new THREE.Vector2();
+const allInteractive = [...allDesks];
+// Add agent groups
+agentGroups.forEach(g => allInteractive.push(g));
+
+/* ==============================
+   INTERACTION: PAN, ZOOM, HOVER, CLICK
+   ============================== */
+let isDragging = false, dragStart = new THREE.Vector2(), dragDelta = new THREE.Vector2();
+let hoveredObject = null;
+
+viewport.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  dragStart.set(e.clientX, e.clientY);
+  dragDelta.set(0,0);
+});
+
+viewport.addEventListener('mousemove', (e) => {
+  if(isDragging){
+    dragDelta.set(e.clientX-dragStart.x, e.clientY-dragStart.y);
+    dragStart.set(e.clientX, e.clientY);
+    // Pan camera
+    const panSpeed = 0.012 / camZoom;
+    camTarget.x -= dragDelta.x * panSpeed;
+    camTarget.z += dragDelta.y * panSpeed;
+    // Clamp
+    camTarget.x = Math.max(-9, Math.min(9, camTarget.x));
+    camTarget.z = Math.max(-5.5, Math.min(8.5, camTarget.z));
+    updateCamera();
+  }
+
+  // Hover detection
+  mouse.x = ((e.clientX - viewport.getBoundingClientRect().left) / viewport.clientWidth) * 2 - 1;
+  mouse.y = -((e.clientY - viewport.getBoundingClientRect().top) / viewport.clientHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(allInteractive, true);
+  const tooltip = document.getElementById('tooltip');
+
+  if(intersects.length > 0){
+    let obj = intersects[0].object;
+    while(obj && !obj.userData?.dept && !obj.userData?.type) obj = obj.parent;
+    if(obj && (obj.userData?.dept || obj.userData?.type)){
+      if(hoveredObject !== obj){
+        hoveredObject = obj;
+        renderer.domElement.style.cursor = 'pointer';
+        const deptId = obj.userData.dept;
+        const dept = DEPTS.find(d => d.id === deptId);
+        if(dept){
+          tooltip.textContent = dept.name;
+          tooltip.style.left = e.clientX - viewport.getBoundingClientRect().left + 'px';
+          tooltip.style.top = e.clientY - viewport.getBoundingClientRect().top + 'px';
+          tooltip.classList.add('visible');
+        }
+      }
+      return;
+    }
+  }
+  // No hover
+  if(hoveredObject){
+    hoveredObject = null;
+    renderer.domElement.style.cursor = 'default';
+    tooltip.classList.remove('visible');
+  }
+});
+
+viewport.addEventListener('mouseup', () => { isDragging = false; });
+viewport.addEventListener('mouseleave', () => { isDragging = false; });
+
+viewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  camZoom *= e.deltaY < 0 ? 1.08 : 0.92;
+  camZoom = Math.max(0.5, Math.min(3.5, camZoom));
+  updateCamera();
+}, {passive:false});
+
+/* ==============================
+   DOUBLE-CLICK: FOCUS
+   ============================== */
+viewport.addEventListener('dblclick', (e) => {
+  mouse.x = ((e.clientX - viewport.getBoundingClientRect().left) / viewport.clientWidth) * 2 - 1;
+  mouse.y = -((e.clientY - viewport.getBoundingClientRect().top) / viewport.clientHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(allInteractive, true);
+  if(intersects.length > 0){
+    let obj = intersects[0].object;
+    while(obj && !obj.userData?.dept && !obj.userData?.type) obj = obj.parent;
+    if(obj?.userData?.dept){
+      const dept = DEPTS.find(d => d.id === obj.userData.dept);
+      if(dept){
+        animateCamera(dept.pos.x, dept.pos.z + 1.5, 2.5, 800);
+        highlightDepartment(dept.id);
+      }
+    }
+  }
+});
+
+/* ==============================
+   CAMERA ANIMATION
+   ============================== */
+function animateCamera(tx, tz, zoom, duration){
+  const startX = camTarget.x, startZ = camTarget.z, startZoom = camZoom;
+  const startTime = performance.now();
+
+  function step(now){
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+    camTarget.x = startX + (tx - startX) * ease;
+    camTarget.z = startZ + (tz - startZ) * ease;
+    if(zoom) camZoom = startZoom + (zoom - startZoom) * ease;
+    updateCamera();
+    if(t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ==============================
+   UI SYNC
+   ============================== */
+function highlightDepartment(deptId){
+  document.querySelectorAll('.department-item').forEach(el => el.classList.remove('active'));
+  const item = document.querySelector(`.department-item[data-dept="${deptId}"]`);
+  if(item) item.classList.add('active');
+}
+
+// Department list clicks
+document.querySelectorAll('.department-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const deptId = item.dataset.dept;
+    document.querySelectorAll('.department-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+    if(deptId === 'all'){
+      animateCamera(0, 1.5, 1, 800);
+    } else {
+      const dept = DEPTS.find(d => d.id === deptId);
+      if(dept) animateCamera(dept.pos.x, dept.pos.z + 1.5, 2.5, 800);
+    }
+  });
+});
+
+// Viewport preset buttons
+document.querySelectorAll('.viewport-controls button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.viewport-controls button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const preset = btn.dataset.preset;
+    switch(preset){
+      case 'overview': animateCamera(0, 3, 1, 800); break;
+      case 'ibd':      animateCamera(-6.5, -3.5, 3, 800); break;
+      case 'am':       animateCamera(3, -3.5, 3, 800); break;
+      case 'rm':       animateCamera(-6.5, 3, 3, 800); break;
+      case 'meeting':  animateCamera(6, 6.5, 3, 800); break;
+      case 'detail':   animateCamera(0, 2, 3.5, 800); break;
+    }
+  });
+});
+
+// Top nav sync
+document.querySelectorAll('#topbar nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#topbar nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    const presetMap = { overview:'overview', ibd:'ibd', am:'am', rm:'rm', meeting:'meeting' };
+    const preset = presetMap[view];
+    if(preset){
+      document.querySelectorAll('.viewport-controls button').forEach(b => {
+        b.classList.toggle('active', b.dataset.preset === preset);
+      });
+    }
+  });
+});
+
+/* ==============================
+   ANIMATION LOOP
+   ============================== */
+const clock = new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // Animate geometric agents
+  agentGroups.forEach(g => {
+    const { core, ring, ring2, dot } = g.userData;
+    if(core) core.rotation.y += 0.008; core.rotation.x += 0.003;
+    if(ring) ring.rotation.z += 0.015;
+    if(ring2) ring2.rotation.z -= 0.01;
+    // Pulse glow
+    if(core){
+      const pulse = 0.3 + Math.sin(t * 2 + g.userData.dept.pos.x) * 0.15;
+      core.material.emissiveIntensity = pulse;
+    }
+    // Dot pulsing
+    if(dot){
+      const s = 1 + Math.sin(t*4) * 0.2;
+      dot.scale.setScalar(s);
+    }
+  });
+
+  // Corridor particles
+  if(corridorData.particles){
+    corridorData.particles.forEach(p => {
+      p.position.x += p.userData.speed * 0.02;
+      if(p.position.x > 9){
+        p.position.x = -9;
+      }
+      // Fade at edges
+      const dist = Math.abs(p.position.x);
+      p.material.opacity = dist > 7 ? Math.max(0.1, 0.8 * (1 - (dist-7)/2)) : 0.8;
+    });
+  }
+
+  // Subtle floating of KPI sprites is handled by their static positions
+  // Agent ring wobble
+  agentGroups.forEach(g => {
+    if(g.userData.ring) g.userData.ring.scale.setScalar(1 + Math.sin(t*3 + g.userData.dept.pos.x) * 0.06);
+  });
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ==============================
+   RESIZE HANDLER
+   ============================== */
+window.addEventListener('resize', () => {
+  const w = viewport.clientWidth, h = viewport.clientHeight;
+  renderer.setSize(w, h);
+  const a = w / h;
+  camera.left = frustumSize * a / -2 / camZoom;
+  camera.right = frustumSize * a / 2 / camZoom;
+  camera.top = frustumSize / 2 / camZoom;
+  camera.bottom = frustumSize / -2 / camZoom;
+  camera.updateProjectionMatrix();
+});
+
+console.log('%c🏢 NexusAI v4 · Financial Digital Twin %cReady',
+  'font-family:"Playfair Display";font-size:18px;color:#1E3A5F;',
+  'color:#10B981;');
+console.log('%cScene: Open-plan office · Isometric view · 5 departments · 15 workstations',
+  'color:#64748B;font-size:11px;');
+</script>
+</body>
+</html>

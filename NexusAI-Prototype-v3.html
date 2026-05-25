@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAI · 金融数字孪生城区</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+</script>
+<style>
+/* =============================================
+   NexusAI Design System v3 — OKLCH · Warm Gold
+   "长得更像个游戏" — 拟人化·叙事化·可视化进度
+   ============================================= */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ease-out-quart: cubic-bezier(0.25,1,0.5,1);
+  --ease-out-expo: cubic-bezier(0.16,1,0.3,1);
+  --dur-fast:120ms; --dur-normal:280ms; --dur-slow:500ms; --dur-epic:900ms;
+
+  --font-display:'Playfair Display','Times New Roman',serif;
+  --font-body:'DM Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --fs-xs:0.625rem; --fs-sm:0.75rem; --fs-md:0.875rem; --fs-lg:1rem;
+  --fs-xl:1.25rem; --fs-2xl:1.75rem; --fs-3xl:2.25rem;
+
+  --space-1:0.25rem; --space-2:0.5rem; --space-3:0.75rem; --space-4:1rem;
+  --space-5:1.25rem; --space-6:1.5rem; --space-8:2rem;
+
+  --radius-sm:4px; --radius-md:6px; --radius-lg:10px; --radius-xl:14px;
+
+  --void: oklch(5% 0.01 80);
+  --base: oklch(8% 0.012 80);
+  --surface-0: oklch(11% 0.014 80);
+  --surface-1: oklch(15% 0.014 80);
+  --surface-2: oklch(19% 0.014 80);
+  --surface-3: oklch(24% 0.012 80);
+
+  --text-primary: oklch(93% 0.006 80);
+  --text-secondary: oklch(72% 0.01 80);
+  --text-muted: oklch(48% 0.008 80);
+
+  --gold-300: oklch(74% 0.12 82);
+  --gold-500: oklch(62% 0.14 82);
+  --gold-dim: oklch(62% 0.14 82 / 0.12);
+  --gold-glow: oklch(68% 0.16 82 / 0.18);
+
+  --red: oklch(55% 0.17 25);
+  --red-dim: oklch(55% 0.17 25 / 0.1);
+  --green: oklch(58% 0.14 155);
+  --green-dim: oklch(58% 0.14 155 / 0.1);
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.25);
+  --shadow-md: 0 2px 8px oklch(0% 0 0 / 0.3), 0 1px 3px oklch(0% 0 0 / 0.2);
+
+  --z-sticky:200; --z-overlay:300; --z-toast:500;
+
+  --top-h:48px; --bottom-h:30px; --left-w:250px; --right-w:340px;
+}
+
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:var(--font-body);
+  font-size:var(--fs-md);
+  background:var(--void);
+  color:var(--text-primary);
+  display:grid;
+  grid-template-rows:var(--top-h) 1fr var(--bottom-h);
+  grid-template-columns:var(--left-w) 1fr var(--right-w);
+  grid-template-areas:'top top top''left center right''bottom bottom bottom';
+  -webkit-font-smoothing:antialiased;
+}
+
+body::before{
+  content:''; position:fixed; inset:0; z-index:var(--z-toast); pointer-events:none;
+  opacity:0.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection{background:var(--gold-500);color:var(--void)}
+:focus-visible{outline:2px solid var(--gold-500);outline-offset:2px;border-radius:var(--radius-sm)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px}
+
+.glass{
+  background: oklch(18% 0.014 80 / 0.55);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  border:1px solid oklch(100% 0 0 / 0.07);
+  box-shadow:0 2px 16px oklch(0% 0 0 / 0.25),inset 0 1px 0 oklch(100% 0 0 / 0.04);
+}
+
+/* ===== TOP BAR ===== */
+.top-bar{
+  grid-area:top; display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--space-6);
+  background:oklch(12% 0.014 80 / 0.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid oklch(100% 0 0 / 0.06);
+  z-index:var(--z-sticky);
+  animation:slideDown var(--dur-slow) var(--ease-out-expo) both;
+}
+.logo-group{display:flex; align-items:center; gap:var(--space-3)}
+.logo-mark{
+  width:28px; height:28px;
+  background:linear-gradient(135deg,var(--gold-500),var(--gold-300));
+  border-radius:var(--radius-sm);
+  box-shadow:0 0 12px var(--gold-glow);
+}
+.logo-text{font-family:var(--font-display); font-size:var(--fs-xl); font-weight:var(--fw-bold); letter-spacing:0.02em}
+.logo-sub{font-size:var(--fs-xs); color:var(--text-muted); letter-spacing:0.12em; text-transform:uppercase}
+.search-box{position:relative; width:280px}
+.search-box svg{position:absolute; left:var(--space-3); top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--text-muted); transition:color var(--dur-fast)}
+.search-box input{
+  width:100%; height:34px; background:var(--surface-1);
+  border:1px solid oklch(100% 0 0 / 0.06); border-radius:var(--radius-md);
+  padding:0 var(--space-3) 0 var(--space-8);
+  font-family:var(--font-body); font-size:var(--fs-sm); color:var(--text-primary);
+  transition:all var(--dur-fast) var(--ease-out-quart);
+}
+.search-box input:focus{border-color:oklch(68% 0.12 82 / 0.2);background:var(--surface-2);box-shadow:0 0 0 3px var(--gold-dim)}
+.search-box input::placeholder{color:var(--text-muted)}
+.user-bar{display:flex; align-items:center; gap:var(--space-4)}
+.time-display{font-size:var(--fs-sm); color:var(--text-secondary); font-variant-numeric:tabular-nums}
+.avatar{width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--gold-500),var(--gold-300)); border:2px solid var(--gold-dim); cursor:pointer; transition:transform var(--dur-fast);}
+.avatar:hover{transform:scale(1.1)} .avatar:active{transform:scale(0.95)}
+
+/* ===== LEFT PANEL ===== */
+.left-panel{
+  grid-area:left; display:flex; flex-direction:column;
+  padding:var(--space-4); gap:var(--space-3); overflow-y:auto;
+  animation:slideLeft var(--dur-slow) var(--ease-out-expo) both;
+  animation-delay:100ms;
+}
+.section-label{font-size:var(--fs-xs); color:var(--text-muted); text-transform:uppercase; letter-spacing:0.14em; padding:0 var(--space-2)}
+.tree-item{
+  display:flex; align-items:center; gap:var(--space-2);
+  padding:var(--space-2) var(--space-3); border-radius:var(--radius-md);
+  cursor:pointer; font-size:var(--fs-sm); color:var(--text-secondary);
+  transition:all var(--dur-fast) var(--ease-out-quart);
+}
+.tree-item:hover{background:var(--surface-2); color:var(--text-primary)}
+.tree-item:active{background:var(--surface-3); transform:scale(0.985)}
+.tree-item.active{background:var(--gold-dim); color:var(--gold-300); border:1px solid oklch(68% 0.12 82 / 0.2)}
+.tree-dot{width:6px; height:6px; border-radius:50%; background:var(--text-muted); flex-shrink:0}
+.tree-item.active .tree-dot{background:var(--gold-500); box-shadow:0 0 8px var(--gold-glow)}
+.tree-badge{margin-left:auto; font-size:var(--fs-xs); padding:1px 6px; border-radius:99px; background:var(--surface-2); color:var(--text-muted)}
+.tree-badge.warn{background:var(--red-dim); color:var(--red)}
+.tree-badge.ok{background:var(--green-dim); color:var(--green)}
+.tree-children{padding-left:var(--space-4)}
+.tree-expand{width:16px; height:16px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:transform var(--dur-fast); flex-shrink:0}
+.tree-item.open .tree-expand{transform:rotate(90deg)}
+
+/* ===== CENTER ===== */
+.center-scene{grid-area:center; position:relative; overflow:hidden}
+#three-canvas{width:100%; height:100%; display:block}
+
+/* Overlays */
+.scene-tooltip{
+  position:absolute;
+  background:oklch(15% 0.014 80 / 0.92);
+  backdrop-filter:blur(16px);
+  border:1px solid var(--gold-dim);
+  border-radius:var(--radius-lg);
+  padding:var(--space-3) var(--space-4);
+  pointer-events:none;
+  opacity:0;
+  transform:translate(-50%,-120%);
+  transition:opacity var(--dur-fast) var(--ease-out-quart);
+  font-size:var(--fs-sm);
+  white-space:nowrap;
+  z-index:var(--z-overlay);
+}
+.scene-tooltip.visible{opacity:1}
+.scene-tooltip .tt-name{font-weight:var(--fw-semibold); color:var(--gold-300)}
+.scene-tooltip .tt-stat{color:var(--text-secondary); font-size:var(--fs-xs); margin-top:2px}
+
+.scene-legend{
+  position:absolute; top:var(--space-4); right:var(--space-4);
+  padding:var(--space-3); border-radius:var(--radius-md);
+  background:oklch(14% 0.014 80 / 0.7);
+  backdrop-filter:blur(8px);
+  border:1px solid oklch(100% 0 0 / 0.06);
+  font-size:var(--fs-xs); color:var(--text-muted);
+  display:flex; flex-direction:column; gap:var(--space-1);
+  z-index:var(--z-overlay);
+}
+.legend-row{display:flex; align-items:center; gap:var(--space-2)}
+.legend-dot{width:6px; height:6px; border-radius:50%}
+
+.intro-banner{
+  position:absolute; bottom:var(--space-6); left:50%; transform:translateX(-50%);
+  padding:var(--space-2) var(--space-5);
+  background:oklch(14% 0.014 80 / 0.8);
+  backdrop-filter:blur(12px);
+  border:1px solid oklch(100% 0 0 / 0.08);
+  border-radius:99px;
+  font-size:var(--fs-xs); color:var(--text-muted);
+  z-index:var(--z-overlay);
+  animation:fadeIn var(--dur-epic) var(--ease-out-quart) both;
+  animation-delay:600ms;
+}
+.intro-banner span{color:var(--gold-300)}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel{
+  grid-area:right; display:flex; flex-direction:column;
+  padding:var(--space-4); gap:var(--space-4); overflow-y:auto;
+  animation:slideRight var(--dur-slow) var(--ease-out-expo) both;
+  animation-delay:150ms;
+}
+.kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3)}
+.kpi-card{
+  padding:var(--space-4); border-radius:var(--radius-lg);
+  cursor:pointer;
+  transition:all var(--dur-fast) var(--ease-out-quart);
+}
+.kpi-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:oklch(100% 0 0 / 0.12)}
+.kpi-card:active{transform:translateY(0)}
+.kpi-label{font-size:var(--fs-xs); color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:var(--space-1)}
+.kpi-value{font-family:var(--font-display); font-size:var(--fs-3xl); font-weight:var(--fw-bold); line-height:1; margin-bottom:var(--space-1)}
+.kpi-change{font-size:var(--fs-sm); font-weight:var(--fw-medium)}
+.kpi-change.up{color:var(--red)} .kpi-change.down{color:var(--green)}
+.kpi-sub{font-size:var(--fs-xs); color:var(--text-muted); margin-top:var(--space-1)}
+
+.risk-header{display:flex; align-items:center; justify-content:space-between}
+.risk-count{font-size:var(--fs-xs); padding:1px 8px; border-radius:99px; background:var(--red-dim); color:var(--red); font-weight:var(--fw-medium)}
+.risk-item{display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3); border-radius:var(--radius-md); cursor:pointer; transition:all var(--dur-fast)}
+.risk-item:hover{background:var(--surface-2)}
+.risk-severity{width:3px; height:28px; border-radius:2px; flex-shrink:0}
+.risk-severity.critical{background:var(--red)}
+.risk-severity.high{background:oklch(58% 0.12 40)}
+.risk-severity.medium{background:var(--gold-500)}
+.risk-info{flex:1; min-width:0}
+.risk-title{font-size:var(--fs-sm); color:var(--text-primary)}
+.risk-dept{font-size:var(--fs-xs); color:var(--text-muted); margin-top:2px}
+.risk-time{font-size:var(--fs-xs); color:var(--text-muted); font-variant-numeric:tabular-nums}
+
+.chart-wrap{padding:var(--space-4); border-radius:var(--radius-lg)}
+.chart-wrap canvas{width:100%!important; max-height:160px}
+
+/* ===== BOTTOM BAR ===== */
+.bottom-bar{
+  grid-area:bottom; display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--space-6); font-size:var(--fs-xs);
+  background:oklch(10% 0.012 80 / 0.9); backdrop-filter:blur(8px);
+  border-top:1px solid oklch(100% 0 0 / 0.05);
+  color:var(--text-muted); z-index:var(--z-sticky);
+  animation:slideUp var(--dur-slow) var(--ease-out-expo) both;
+  animation-delay:200ms;
+}
+.status-dot{display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--green); margin-right:var(--space-2)}
+.status-dot.pulse{animation:statusPulse 2s ease-in-out infinite}
+.status-group{display:flex; align-items:center; gap:var(--space-6)}
+
+/* ===== KEYFRAMES ===== */
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes slideLeft{from{transform:translateX(-40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideRight{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:0.35}}
+
+.kpi-card:nth-child(1){animation:fadeUp var(--dur-normal) var(--ease-out-quart) both; animation-delay:300ms}
+.kpi-card:nth-child(2){animation:fadeUp var(--dur-normal) var(--ease-out-quart) both; animation-delay:380ms}
+.kpi-card:nth-child(3){animation:fadeUp var(--dur-normal) var(--ease-out-quart) both; animation-delay:460ms}
+.kpi-card:nth-child(4){animation:fadeUp var(--dur-normal) var(--ease-out-quart) both; animation-delay:540ms}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
+  .status-dot.pulse{animation:none}
+}
+@media (max-width:1400px){:root{--left-w:210px;--right-w:300px}}
+@media (max-width:1200px){
+  body{grid-template-columns:var(--left-w) 1fr 0px}
+  .right-panel{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="logo-group">
+    <div class="logo-mark"></div>
+    <div>
+      <span class="logo-text">NexusAI</span>
+      <div class="logo-sub">Digital Twin · 金融数字孪生城区</div>
+    </div>
+  </div>
+  <div class="search-box">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><line x1="11" y1="11" x2="14" y2="14"/></svg>
+    <input type="text" placeholder="搜索部门 / 员工 / 项目..." aria-label="搜索">
+  </div>
+  <div class="user-bar">
+    <span class="time-display" id="clock">--</span>
+    <div class="avatar" tabindex="0" role="button" aria-label="用户菜单"></div>
+  </div>
+</header>
+
+<nav class="left-panel">
+  <div class="section-label">组织架构</div>
+  <div class="tree-item active" data-building="0">
+    <svg class="tree-expand" width="12" height="12" viewBox="0 0 12 12"><path d="M4 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    <div class="tree-dot"></div>华鑫证券总部
+    <span class="tree-badge ok">正常</span>
+  </div>
+  <div class="tree-children">
+    <div class="tree-item open" data-building="1">
+      <svg class="tree-expand" width="12" height="12" viewBox="0 0 12 12"><path d="M4 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="tree-dot"></div>投资银行部
+      <span class="tree-badge warn">3</span>
+    </div>
+    <div class="tree-children">
+      <div class="tree-item" data-building="1"><div class="tree-dot"></div>股权融资组<span class="tree-badge ok">正常</span></div>
+      <div class="tree-item" data-building="1"><div class="tree-dot"></div>并购重组组<span class="tree-badge warn">2</span></div>
+    </div>
+    <div class="tree-item" data-building="2">
+      <svg class="tree-expand" width="12" height="12" viewBox="0 0 12 12"><path d="M4 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="tree-dot"></div>资产管理部
+      <span class="tree-badge ok">正常</span>
+    </div>
+    <div class="tree-item" data-building="3">
+      <svg class="tree-expand" width="12" height="12" viewBox="0 0 12 12"><path d="M4 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="tree-dot"></div>风险管理部
+      <span class="tree-badge warn">4</span>
+    </div>
+    <div class="tree-item" data-building="4">
+      <svg class="tree-expand" width="12" height="12" viewBox="0 0 12 12"><path d="M4 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="tree-dot"></div>信息技术部
+      <span class="tree-badge ok">正常</span>
+    </div>
+  </div>
+  <div class="section-label" style="margin-top:var(--space-4)">我的关注</div>
+  <div class="tree-item"><div class="tree-dot"></div>科创板IPO项目<span class="tree-badge warn">延误</span></div>
+  <div class="tree-item"><div class="tree-dot"></div>Q2 风控合规报告<span class="tree-badge ok">正常</span></div>
+  <div class="tree-item"><div class="tree-dot"></div>量化交易系统 v3.2<span class="tree-badge ok">正常</span></div>
+</nav>
+
+<main class="center-scene">
+  <canvas id="three-canvas"></canvas>
+
+  <div class="scene-tooltip" id="tooltip">
+    <div class="tt-name"></div>
+    <div class="tt-stat"></div>
+  </div>
+
+  <div class="scene-legend">
+    <div class="legend-row"><div class="legend-dot" style="background:var(--gold-500)"></div>运转正常</div>
+    <div class="legend-row"><div class="legend-dot" style="background:oklch(58% 0.12 40)"></div>预警关注</div>
+    <div class="legend-row"><div class="legend-dot" style="background:var(--red)"></div>风险告警</div>
+    <div class="legend-row"><div class="legend-dot" style="background:oklch(65% 0.08 240)"></div>数据流转</div>
+  </div>
+
+  <div class="intro-banner">
+    拖拽鼠标旋转视角 · 滚轮缩放 · <span>点击建筑查看部门详情</span>
+  </div>
+</main>
+
+<aside class="right-panel">
+  <div class="kpi-grid">
+    <div class="kpi-card glass">
+      <div class="kpi-label">今日交易额</div>
+      <div class="kpi-value">¥82.6<span style="font-size:var(--fs-xl)">亿</span></div>
+      <div class="kpi-change up">▲ 12.4%</div>
+      <div class="kpi-sub">较昨日 +9.1亿</div>
+    </div>
+    <div class="kpi-card glass">
+      <div class="kpi-label">活跃工作流</div>
+      <div class="kpi-value">1,284</div>
+      <div class="kpi-change up">▲ 8.7%</div>
+      <div class="kpi-sub">完成率 94.2%</div>
+    </div>
+    <div class="kpi-card glass">
+      <div class="kpi-label">预警工单</div>
+      <div class="kpi-value" style="color:var(--red)">37</div>
+      <div class="kpi-change down">▼ 15.9%</div>
+      <div class="kpi-sub">较昨日 -7</div>
+    </div>
+    <div class="kpi-card glass">
+      <div class="kpi-label">在线员工</div>
+      <div class="kpi-value">2,841</div>
+      <div class="kpi-change down">▼ 3.2%</div>
+      <div class="kpi-sub">出勤率 96.8%</div>
+    </div>
+  </div>
+
+  <div class="glass" style="padding:var(--space-4);border-radius:var(--radius-lg)">
+    <div class="risk-header" style="margin-bottom:var(--space-3)">
+      <span style="font-size:var(--fs-sm);font-weight:var(--fw-semibold);color:var(--text-secondary)">风险预警</span>
+      <span class="risk-count">5条待处理</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-1)">
+      <div class="risk-item"><div class="risk-severity critical"></div><div class="risk-info"><div class="risk-title">科创板IPO材料逾期</div><div class="risk-dept">投资银行部 · 股权融资组</div></div><div class="risk-time">14:32</div></div>
+      <div class="risk-item"><div class="risk-severity high"></div><div class="risk-info"><div class="risk-title">异常大额交易触发</div><div class="risk-dept">风险管理部 · 市场监控</div></div><div class="risk-time">13:58</div></div>
+      <div class="risk-item"><div class="risk-severity high"></div><div class="risk-info"><div class="risk-title">并购重组合规审查超时</div><div class="risk-dept">投资银行部 · 并购重组组</div></div><div class="risk-time">13:15</div></div>
+      <div class="risk-item"><div class="risk-severity medium"></div><div class="risk-info"><div class="risk-title">量化系统延迟波动</div><div class="risk-dept">信息技术部 · 量化交易组</div></div><div class="risk-time">12:07</div></div>
+    </div>
+  </div>
+
+  <div class="chart-wrap glass">
+    <div class="section-label" style="margin-bottom:var(--space-2)">工作流效率趋势</div>
+    <canvas id="trendChart"></canvas>
+  </div>
+</aside>
+
+<footer class="bottom-bar">
+  <div class="status-group">
+    <span><span class="status-dot pulse"></span>系统运行正常</span>
+    <span>NexusAI v3.2.1</span>
+    <span>节点: 上海-01 · 北京-02 · 深圳-01</span>
+  </div>
+  <div class="status-group">
+    <span>延迟 12ms</span>
+    <span>上行 8.4 Mbps</span>
+    <span>最后同步 14:58:02</span>
+  </div>
+</footer>
+
+<script>
+/* === CLOCK === */
+function uc(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('zh-CN',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+uc();setInterval(uc,1000);
+
+/* ============================================
+   THREE.JS — 金融数字孪生城区
+   核心设计：让场景「会讲故事」
+   - 每栋楼是一个部门，外观反映部门性格
+   - 楼间有数据流桥梁（金色粒子沿路径流动）
+   - 楼顶有悬浮 KPI 全息投影
+   - 楼前广场有小角色在工作/移动
+   - 风险部门会闪烁红色，正常部门温暖金色
+   ============================================ */
+(function(){
+  const canvas=document.getElementById('three-canvas');
+  const container=canvas.parentElement;
+  const tooltip=document.getElementById('tooltip');
+
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.15;
+
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x0e1018,0.00018);
+  scene.background=new THREE.Color(0x0e1018);
+
+  const camera=new THREE.PerspectiveCamera(50,2,1,120);
+  camera.position.set(16,22,28);
+  camera.lookAt(0,3,0);
+
+  function resize(){
+    const w=container.clientWidth,h=container.clientHeight;
+    renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  resize();window.addEventListener('resize',resize);
+
+  /* === LIGHTING — Golden hour warmth === */
+  const amb=new THREE.AmbientLight(0x3a3040,0.5); scene.add(amb);
+  const hemi=new THREE.HemisphereLight(0xffe9c8,0x1a2030,0.4); scene.add(hemi);
+
+  const sun=new THREE.DirectionalLight(0xffecd0,1.2);
+  sun.position.set(40,50,20); sun.castShadow=true;
+  sun.shadow.mapSize.set(2048,2048);
+  sun.shadow.camera.near=1; sun.shadow.camera.far=120;
+  sun.shadow.camera.left=-30; sun.shadow.camera.right=30;
+  sun.shadow.camera.top=30; sun.shadow.camera.bottom=-30;
+  sun.shadow.bias=-0.00015;
+  scene.add(sun);
+
+  /* === GROUND — Plaza with grid === */
+  const groundGeo=new THREE.PlaneGeometry(80,80);
+  const groundMat=new THREE.MeshStandardMaterial({color:0x1a1d28,roughness:0.9,metalness:0.05});
+  const ground=new THREE.Mesh(groundGeo,groundMat);
+  ground.rotation.x=-Math.PI/2; ground.position.y=-0.5;
+  ground.receiveShadow=true; scene.add(ground);
+
+  /* Subtle grid */
+  const grid=new THREE.PolarGridHelper(35,48,32,120,0x2a2d3a,0x2a2d3a);
+  grid.position.y=-0.49; scene.add(grid);
+
+  /* Central plaza — circular platform */
+  const plazaGeo=new THREE.CylinderGeometry(3.5,3.8,0.3,48);
+  const plazaMat=new THREE.MeshStandardMaterial({color:0x2a2d38,roughness:0.5,metalness:0.3});
+  const plaza=new THREE.Mesh(plazaGeo,plazaMat);
+  plaza.position.y=-0.35; plaza.receiveShadow=true; scene.add(plaza);
+
+  /* Plaza fountain — golden ring */
+  const fountainBase=new THREE.Mesh(
+    new THREE.CylinderGeometry(1.0,1.2,0.4,32),
+    new THREE.MeshStandardMaterial({color:0x3a3040,roughness:0.3,metalness:0.6})
+  );
+  fountainBase.position.y=-0.1; scene.add(fountainBase);
+
+  const fountainRing=new THREE.Mesh(
+    new THREE.TorusGeometry(1.0,0.08,16,48),
+    new THREE.MeshStandardMaterial({color:0xc9a84c,roughness:0.2,metalness:0.8,emissive:0xc9a84c,emissiveIntensity:0.3})
+  );
+  fountainRing.rotation.x=Math.PI/2; fountainRing.position.y=0.15; scene.add(fountainRing);
+
+  /* Fountain glow particles */
+  const fountainGlowGeo=new THREE.BufferGeometry();
+  const fpCount=40;
+  const fpPos=new Float32Array(fpCount*3);
+  for(let i=0;i<fpCount;i++){
+    const a=Math.random()*Math.PI*2, r=0.3+Math.random()*0.6;
+    fpPos[i*3]=Math.cos(a)*r; fpPos[i*3+1]=Math.random()*1.5; fpPos[i*3+2]=Math.sin(a)*r;
+  }
+  fountainGlowGeo.setAttribute('position',new THREE.BufferAttribute(fpPos,3));
+  const fountainGlow=new THREE.Points(fountainGlowGeo,
+    new THREE.PointsMaterial({size:0.06,color:0xc9a84c,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.6})
+  );
+  fountainGlow.position.y=0.1; scene.add(fountainGlow);
+
+  /* === BUILDINGS — 5 departments, each with character === */
+  const buildingDefs=[
+    {name:'华鑫证券总部',x:0,z:0, floors:10,color:0xc9a84c,status:'normal', desc:'总部 · 综合运营中'},
+    {name:'投资银行部',x:-8,z:5, floors:7,color:0xd4a040,status:'warning', desc:'3项预警 · IPO材料逾期'},
+    {name:'资产管理部',x:7,z:4, floors:6,color:0x50a060,status:'normal', desc:'运行正常 · 管理规模520亿'},
+    {name:'风险管理部',x:-6,z:-5,floors:8,color:0xc44a4a,status:'critical', desc:'4项告警 · 异常交易触发'},
+    {name:'信息技术部',x:8,z:-4,floors:6,color:0x4488cc,status:'normal', desc:'系统稳定 · 延迟12ms'},
+  ];
+
+  const buildings=[];
+  const clickTargets=[];
+
+  buildingDefs.forEach((def,i)=>{
+    const group=new THREE.Group();
+    group.position.set(def.x,0,def.z);
+    group.userData={name:def.name,status:def.status,desc:def.desc,index:i};
+
+    /* Main body with status-based window glow */
+    const bodyMat=new THREE.MeshStandardMaterial({
+      color:def.color, roughness:0.3, metalness:0.4,
+      emissive:def.color, emissiveIntensity:i===0?0.25:(def.status==='critical'?0.4:0.15)
+    });
+    const bodyW=2.4+(i===0?1:0); const bodyD=2.4+(i===0?1:0);
+    const body=new THREE.Mesh(new THREE.BoxGeometry(bodyW,def.floors*1.2,bodyD),bodyMat);
+    body.position.y=def.floors*0.6;
+    body.castShadow=true; body.receiveShadow=true;
+    group.add(body);
+
+    /* Window rows — horizontal glowing strips per floor */
+    for(let f=0;f<def.floors;f++){
+      const y=f*1.2+0.6;
+      const stripMat=new THREE.MeshStandardMaterial({
+        color:0xffe9c8, emissive:0xffe9c8,
+        emissiveIntensity:def.status==='critical'&&f%2===0?0.8:(def.status==='warning'?0.5:0.3),
+        roughness:0.1, metalness:0.1
+      });
+      /* Front/back windows */
+      const winFront=new THREE.Mesh(new THREE.BoxGeometry(bodyW-0.4,0.15,0.06),stripMat);
+      winFront.position.set(0,y,bodyD/2+0.03); group.add(winFront);
+      const winBack=new THREE.Mesh(new THREE.BoxGeometry(bodyW-0.4,0.15,0.06),stripMat);
+      winBack.position.set(0,y,-bodyD/2-0.03); group.add(winBack);
+      /* Side windows */
+      const winSide1=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.15,bodyD-0.4),stripMat);
+      winSide1.position.set(bodyW/2+0.03,y,0); group.add(winSide1);
+      const winSide2=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.15,bodyD-0.4),stripMat);
+      winSide2.position.set(-bodyW/2-0.03,y,0); group.add(winSide2);
+    }
+
+    /* Crown / rooftop */
+    const crownGeo=new THREE.CylinderGeometry(0.3,0.7,0.8,8);
+    const crownMat=new THREE.MeshStandardMaterial({
+      color:def.color, roughness:0.2, metalness:0.7,
+      emissive:def.color, emissiveIntensity:0.5
+    });
+    const crown=new THREE.Mesh(crownGeo,crownMat);
+    crown.position.y=def.floors*1.2+0.4; crown.castShadow=true;
+    group.add(crown);
+
+    /* Rooftop beacon */
+    const beaconGeo=new THREE.SphereGeometry(0.2,16,16);
+    const beaconMat=new THREE.MeshStandardMaterial({
+      color:def.color, emissive:def.color, emissiveIntensity:1.2, roughness:0.1
+    });
+    const beacon=new THREE.Mesh(beaconGeo,beaconMat);
+    beacon.position.y=def.floors*1.2+1.1;
+    beacon.userData={baseY:beacon.position.y,phase:i*1.5, def};
+    group.add(beacon);
+
+    /* Floating KPI label — sprite above building */
+    const labelCanvas=document.createElement('canvas');
+    labelCanvas.width=256; labelCanvas.height=64;
+    const lctx=labelCanvas.getContext('2d');
+    const labelTexture=new THREE.CanvasTexture(labelCanvas);
+    labelTexture.minFilter=THREE.LinearFilter;
+    const labelSprite=new THREE.Sprite(new THREE.SpriteMaterial({
+      map:labelTexture, transparent:true, depthTest:false, depthWrite:false
+    }));
+    labelSprite.scale.set(5,1.25,1);
+    labelSprite.position.y=def.floors*1.2+2.0;
+    labelSprite.userData={canvas:labelCanvas, lctx, def};
+    group.add(labelSprite);
+
+    /* Status indicator ring at base */
+    const ringGeo=new THREE.TorusGeometry(bodyW/2+0.3,0.06,8,32);
+    const ringMat=new THREE.MeshStandardMaterial({
+      color:def.status==='critical'?0xff3333:def.status==='warning'?0xff9944:0x44aa44,
+      emissive:def.status==='critical'?0xff3333:def.status==='warning'?0xff9944:0x44aa44,
+      emissiveIntensity:0.7, roughness:0.2, metalness:0.5
+    });
+    const ring=new THREE.Mesh(ringGeo,ringMat);
+    ring.rotation.x=Math.PI/2; ring.position.y=0.05;
+    group.add(ring);
+
+    /* Base platform */
+    const baseGeo=new THREE.BoxGeometry(bodyW+1,0.2,bodyD+1);
+    const baseMesh=new THREE.Mesh(baseGeo,
+      new THREE.MeshStandardMaterial({color:0x252a36,roughness:0.6,metalness:0.3})
+    );
+    baseMesh.position.y=0.1; baseMesh.receiveShadow=true;
+    group.add(baseMesh);
+
+    scene.add(group);
+    buildings.push(group);
+    clickTargets.push({mesh:body, group, def});
+
+    /* For click: also make crown and ring clickable */
+    clickTargets.push({mesh:crown, group, def});
+    clickTargets.push({mesh:ring, group, def});
+  });
+
+  /* === DATA FLOW BRIDGES — particles flowing between buildings === */
+  const bridgePairs=[
+    [0,1],[0,2],[0,3],[0,4],
+    [1,3],[2,4],[1,2],[3,4],
+  ];
+
+  const flowParticles=[];
+  bridgePairs.forEach(([a,b])=>{
+    const ba=buildingDefs[a], bb=buildingDefs[b];
+    const start=new THREE.Vector3(ba.x, ba.floors*0.6, ba.z);
+    const end=new THREE.Vector3(bb.x, bb.floors*0.6, bb.z);
+    const mid=start.clone().add(end).multiplyScalar(0.5);
+    mid.y+=2+Math.random()*3;
+
+    const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
+
+    /* Dashed line */
+    const points=curve.getPoints(50);
+    const lineGeo=new THREE.BufferGeometry().setFromPoints(points);
+    const line=new THREE.Line(lineGeo,
+      new THREE.LineDashedMaterial({color:0x334455,dashSize:1,gapSize:0.8,transparent:true,opacity:0.25})
+    );
+    line.computeLineDistances();
+    scene.add(line);
+
+    /* Flow particles along this path */
+    const pCount=12+Math.floor(Math.random()*8);
+    for(let i=0;i<pCount;i++){
+      flowParticles.push({
+        curve, t:Math.random(), speed:0.0003+Math.random()*0.0008,
+        color:Math.random()>0.3?0xc9a84c:0x4488cc,
+      });
+    }
+  });
+
+  /* Unified flow particle system */
+  const flowGeo=new THREE.BufferGeometry();
+  const flowPositions=new Float32Array(flowParticles.length*3);
+  const flowColors=new Float32Array(flowParticles.length*3);
+  flowGeo.setAttribute('position',new THREE.BufferAttribute(flowPositions,3));
+  flowGeo.setAttribute('color',new THREE.BufferAttribute(flowColors,3));
+  const flowMesh=new THREE.Points(flowGeo,
+    new THREE.PointsMaterial({size:0.12,vertexColors:true,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.7})
+  );
+  scene.add(flowMesh);
+
+  /* === AMBIENT PARTICLES — data in the air === */
+  const ambientCount=200;
+  const ambientGeo=new THREE.BufferGeometry();
+  const ambientPos=new Float32Array(ambientCount*3);
+  const ambientCol=new Float32Array(ambientCount*3);
+  const ambientData=[];
+  for(let i=0;i<ambientCount;i++){
+    ambientPos[i*3]=(Math.random()-0.5)*35;
+    ambientPos[i*3+1]=0.5+Math.random()*14;
+    ambientPos[i*3+2]=(Math.random()-0.5)*35;
+    ambientCol[i*3]=1; ambientCol[i*3+1]=0.85; ambientCol[i*3+2]=0.55;
+    ambientData.push({speed:0.003+Math.random()*0.012,amp:0.1+Math.random()*0.8,phase:Math.random()*Math.PI*2});
+  }
+  ambientGeo.setAttribute('position',new THREE.BufferAttribute(ambientPos,3));
+  ambientGeo.setAttribute('color',new THREE.BufferAttribute(ambientCol,3));
+  const ambientMesh=new THREE.Points(ambientGeo,
+    new THREE.PointsMaterial({size:0.06,vertexColors:true,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.45})
+  );
+  scene.add(ambientMesh);
+
+  /* === DECORATIVE ELEMENTS — trees around plaza === */
+  for(let i=0;i<16;i++){
+    const angle=(i/16)*Math.PI*2;
+    const r=5+Math.random()*2;
+    const treeGroup=new THREE.Group();
+    treeGroup.position.set(Math.cos(angle)*r,0,Math.sin(angle)*r);
+
+    /* Trunk */
+    const trunk=new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08,0.12,1.2,8),
+      new THREE.MeshStandardMaterial({color:0x4a3a2a,roughness:0.8})
+    );
+    trunk.position.y=0.6; trunk.castShadow=true;
+    treeGroup.add(trunk);
+
+    /* Canopy */
+    const canopy=new THREE.Mesh(
+      new THREE.SphereGeometry(0.5,8,8),
+      new THREE.MeshStandardMaterial({color:0x2a4a2a,roughness:0.7})
+    );
+    canopy.position.y=1.3; canopy.castShadow=true;
+    treeGroup.add(canopy);
+
+    scene.add(treeGroup);
+  }
+
+  /* === RAYCASTER — click interaction === */
+  const raycaster=new THREE.Raycaster();
+  raycaster.params.Points.threshold=0.5;
+  const mouse=new THREE.Vector2();
+
+  canvas.addEventListener('mousemove',(e)=>{
+    const rect=canvas.getBoundingClientRect();
+    mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+
+    raycaster.setFromCamera(mouse,camera);
+    const intersects=raycaster.intersectObjects(clickTargets.map(c=>c.mesh));
+
+    if(intersects.length>0){
+      const obj=intersects[0].object;
+      const target=clickTargets.find(c=>c.mesh===obj);
+      if(target){
+        canvas.style.cursor='pointer';
+        tooltip.querySelector('.tt-name').textContent=target.def.name;
+        tooltip.querySelector('.tt-stat').textContent=target.def.desc;
+        tooltip.classList.add('visible');
+        tooltip.style.left=(e.clientX-rect.left)+'px';
+        tooltip.style.top=(e.clientY-rect.top)+'px';
+        return;
+      }
+    }
+    canvas.style.cursor='grab';
+    tooltip.classList.remove('visible');
+  });
+
+  canvas.addEventListener('click',(e)=>{
+    raycaster.setFromCamera(mouse,camera);
+    const intersects=raycaster.intersectObjects(clickTargets.map(c=>c.mesh));
+    if(intersects.length>0){
+      const obj=intersects[0].object;
+      const target=clickTargets.find(c=>c.mesh===obj);
+      if(target){
+        /* Animate camera to building */
+        const pos=target.group.position;
+        animateCameraTo(pos.x,pos.z,target.def.floors);
+        /* Highlight in left panel */
+        document.querySelectorAll('.tree-item').forEach(el=>el.classList.remove('active'));
+        const treeItem=document.querySelector(`[data-building="${target.def.index}"]`);
+        if(treeItem) treeItem.classList.add('active');
+      }
+    }
+  });
+
+  let camTarget=null, camAnimStart=0, camAnimDur=0;
+  let camStartPos=new THREE.Vector3(), camStartLook=new THREE.Vector3();
+
+  function animateCameraTo(bx,bz,floors){
+    camStartPos.copy(camera.position);
+    camStartLook.set(0,floors*0.6,0);
+    camTarget={x:bx+8,y:floors*0.8+10,z:bz+12,lookX:bx,lookY:floors*0.6,lookZ:bz};
+    camAnimStart=performance.now();
+    camAnimDur=1200;
+  }
+
+  /* === RENDER LOOP === */
+  const clock3=new THREE.Clock();
+  let camAutoMode=true;
+
+  function animate(){
+    requestAnimationFrame(animate);
+    const t=clock3.getElapsedTime();
+    const dt=Math.min(clock3.getDelta(),0.1);
+
+    /* Camera — auto orbit or fly-to animation */
+    if(camAnimStart>0){
+      const elapsed=performance.now()-camAnimStart;
+      const progress=Math.min(elapsed/camAnimDur,1);
+      const ease=1-Math.pow(1-progress,3);
+      camera.position.lerpVectors(camStartPos,
+        new THREE.Vector3(camTarget.x,camTarget.y,camTarget.z),ease);
+      camera.lookAt(
+        camStartLook.x+(camTarget.lookX-camStartLook.x)*ease,
+        camStartLook.y+(camTarget.lookY-camStartLook.y)*ease,
+        camStartLook.z+(camTarget.lookZ-camStartLook.z)*ease
+      );
+      if(progress>=1){camAnimStart=0;camAutoMode=false;
+        /* Resume auto after 4s */
+        setTimeout(()=>{camAutoMode=true;},4000);
+      }
+    }else if(camAutoMode){
+      const r=26+Math.sin(t*0.1)*3;
+      const a=t*0.12;
+      camera.position.set(Math.sin(a)*r,16+Math.sin(t*0.2)*3,Math.cos(a)*r);
+      camera.lookAt(0,4,0);
+    }
+
+    /* Fountain ring rotation */
+    fountainRing.rotation.z+=0.008;
+
+    /* Fountain glow particles */
+    const fgPos=fountainGlow.geometry.attributes.position.array;
+    for(let i=0;i<fpCount;i++){
+      fgPos[i*3+1]+=0.012;
+      if(fgPos[i*3+1]>1.6){
+        fgPos[i*3+1]=0;
+        const a=Math.random()*Math.PI*2, r=0.3+Math.random()*0.6;
+        fgPos[i*3]=Math.cos(a)*r; fgPos[i*3+2]=Math.sin(a)*r;
+      }
+    }
+    fountainGlow.geometry.attributes.position.needsUpdate=true;
+
+    /* Building beacons */
+    buildings.forEach(group=>{
+      const beacon=group.children.find(c=>c.geometry?.type==='SphereGeometry'&&c.position.y>2);
+      if(!beacon) return;
+      const def=beacon.userData.def;
+      const pulseSpeed=def?.status==='critical'?5:def?.status==='warning'?3:2;
+      const pulseAmp=def?.status==='critical'?0.35:0.15;
+      beacon.position.y=beacon.userData.baseY+Math.sin(t*pulseSpeed+beacon.userData.phase)*pulseAmp;
+      beacon.material.emissiveIntensity=0.8+Math.sin(t*pulseSpeed+beacon.userData.phase)*0.5;
+    });
+
+    /* Status rings pulse */
+    buildings.forEach((group,i)=>{
+      const ring=group.children.find(c=>c.geometry?.type==='TorusGeometry');
+      if(!ring) return;
+      const def=buildingDefs[i];
+      if(def.status==='critical'){
+        ring.material.emissiveIntensity=0.5+Math.sin(t*6)*0.4;
+        ring.scale.setScalar(1+Math.sin(t*6)*0.06);
+      }else if(def.status==='warning'){
+        ring.material.emissiveIntensity=0.4+Math.sin(t*3.5)*0.3;
+      }
+    });
+
+    /* Flow particles along bridges */
+    for(let i=0;i<flowParticles.length;i++){
+      const fp=flowParticles[i];
+      fp.t=(fp.t+fp.speed)%1;
+      const pt=fp.curve.getPoint(fp.t);
+      flowPositions[i*3]=pt.x; flowPositions[i*3+1]=pt.y; flowPositions[i*3+2]=pt.z;
+      const c=new THREE.Color(fp.color);
+      flowColors[i*3]=c.r; flowColors[i*3+1]=c.g; flowColors[i*3+2]=c.b;
+    }
+    flowMesh.geometry.attributes.position.needsUpdate=true;
+    flowMesh.geometry.attributes.color.needsUpdate=true;
+
+    /* Ambient particles */
+    for(let i=0;i<ambientCount;i++){
+      const ad=ambientData[i];
+      ambientPos[i*3+1]=(ambientPos[i*3+1]+ad.speed)%14;
+      ambientPos[i*3]+=Math.sin(t*1.5+ad.phase)*ad.amp*0.02;
+      ambientPos[i*3+2]+=Math.cos(t*1.2+ad.phase)*ad.amp*0.02;
+    }
+    ambientMesh.geometry.attributes.position.needsUpdate=true;
+
+    /* Update building KPI labels */
+    buildings.forEach(group=>{
+      const sprite=group.children.find(c=>c.isSprite);
+      if(!sprite||!sprite.userData.lctx) return;
+      const def=sprite.userData.def;
+      const lctx=sprite.userData.lctx;
+      const canvas=sprite.userData.canvas;
+      lctx.clearRect(0,0,canvas.width,canvas.height);
+
+      /* Background pill */
+      lctx.fillStyle='rgba(14,16,24,0.7)';
+      lctx.beginPath(); lctx.roundRect(20,5,216,54,12); lctx.fill();
+      lctx.strokeStyle='rgba(201,168,76,0.25)';
+      lctx.lineWidth=1; lctx.stroke();
+
+      /* Name */
+      lctx.fillStyle='#e8d5a0'; lctx.font='bold 16px "DM Sans","Segoe UI",sans-serif';
+      lctx.textAlign='center'; lctx.fillText(def.name,128,28);
+
+      /* Status line */
+      const statusColor=def.status==='critical'?'#ff5555':def.status==='warning'?'#ffaa44':'#66cc88';
+      const statusText=def.status==='critical'?'⚠ 风险告警':def.status==='warning'?'● 预警关注':'● 运行正常';
+      lctx.fillStyle=statusColor; lctx.font='11px "DM Sans","Segoe UI",sans-serif';
+      lctx.fillText(statusText,128,48);
+
+      sprite.material.map.needsUpdate=true;
+    });
+
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  /* === MOUSE DRAG — orbit === */
+  let isDragging=false, prevMouse={x:0,y:0};
+  canvas.addEventListener('mousedown',(e)=>{
+    if(e.button===0){isDragging=true;prevMouse={x:e.clientX,y:e.clientY};camAutoMode=false;}
+  });
+  window.addEventListener('mousemove',(e)=>{
+    if(!isDragging) return;
+    const dx=e.clientX-prevMouse.x, dy=e.clientY-prevMouse.y;
+    prevMouse={x:e.clientX,y:e.clientY};
+    const spherical=new THREE.Spherical();
+    spherical.setFromVector3(camera.position.clone().sub(new THREE.Vector3(0,5,0)));
+    spherical.theta-=dx*0.005;
+    spherical.phi-=dy*0.005;
+    spherical.phi=Math.max(0.3,Math.min(1.3,spherical.phi));
+    spherical.radius=Math.max(15,Math.min(50,spherical.radius));
+    const pos=new THREE.Vector3().setFromSpherical(spherical).add(new THREE.Vector3(0,5,0));
+    camera.position.copy(pos);
+    camera.lookAt(0,5,0);
+  });
+  window.addEventListener('mouseup',()=>{isDragging=false;
+    setTimeout(()=>{if(!isDragging)camAutoMode=true;},3000);
+  });
+  canvas.addEventListener('wheel',(e)=>{
+    e.preventDefault();
+    const spherical=new THREE.Spherical();
+    spherical.setFromVector3(camera.position.clone().sub(new THREE.Vector3(0,5,0)));
+    spherical.radius-=e.deltaY*0.05;
+    spherical.radius=Math.max(15,Math.min(50,spherical.radius));
+    const pos=new THREE.Vector3().setFromSpherical(spherical).add(new THREE.Vector3(0,5,0));
+    camera.position.copy(pos);
+  },{passive:false});
+})();
+
+/* ============================================
+   CHART.JS
+   ============================================ */
+(function(){
+  const ctx=document.getElementById('trendChart').getContext('2d');
+  const g=ctx.createLinearGradient(0,0,0,160);
+  g.addColorStop(0,'rgba(201,168,76,0.25)'); g.addColorStop(1,'rgba(201,168,76,0.0)');
+  new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['09:00','10:00','11:00','12:00','13:00','14:00','15:00'],
+      datasets:[{
+        label:'完成率',data:[92,88,94,91,96,93,97],
+        borderColor:'rgba(201,168,76,1)',backgroundColor:g,fill:true,
+        tension:0.4,borderWidth:1.5,pointRadius:0,pointHoverRadius:4,
+        pointHoverBackgroundColor:'rgba(201,168,76,1)',
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:1000,easing:'easeInOutCubic'},
+      plugins:{legend:{display:false}},
+      scales:{x:{display:false},y:{display:false,min:75,max:100}},
+      interaction:{mode:'index',intersect:false},
+    }
+  });
+})();
+
+/* === TREE ITEM CLICK — fly to building === */
+document.querySelectorAll('.tree-item[data-building]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.tree-item').forEach(e=>e.classList.remove('active'));
+    el.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
